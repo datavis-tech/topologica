@@ -87,7 +87,9 @@ If you have any ideas concerning developer ergonomics, syntactic sugar, or new f
 
 ## Related Work
 
-This library is a minimalistic reincarnation of [ReactiveModel](https://github.com/datavis-tech/reactive-model), which is a re-write of its precursor [Model.js](https://github.com/curran/model). The minimalism and synchronous execution are inspired by similar features in [Observable](https://beta.observablehq.com).
+This library is a minimalistic reincarnation of [ReactiveModel](https://github.com/datavis-tech/reactive-model), which is a re-write of its precursor [Model.js](https://github.com/curran/model).
+
+The minimalism and synchronous execution are inspired by similar features in [Observable](https://beta.observablehq.com).
 
 Similar initiatives:
 
