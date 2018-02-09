@@ -1,0 +1,32 @@
+{
+  "name": "topologica",
+  "version": "0.1.0",
+  "description": "Minimal library for reactive dataflow programming.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rollup -c",
+    "pretest": "npm run build",
+    "test": "mocha",
+    "prepublishOnly": "npm run test && uglifyjs dist/topologica.js -c -m -o dist/topologica.min.js",
+    "postpublish": "git push && git push --tags"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/datavis-tech/topologica.git"
+  },
+  "keywords": [
+    "dataflow",
+    "reactive"
+  ],
+  "author": "Curran Kelleher",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/datavis-tech/topologica/issues"
+  },
+  "homepage": "https://github.com/datavis-tech/topologica#readme",
+  "devDependencies": {
+    "mocha": "^5.0.0",
+    "rollup": "^0.55.3",
+    "uglify-js": "^3.3.10"
+  }
+}
