@@ -9,9 +9,8 @@ export default options => {
   const graph = Graph();
 
   const digest = () => {
-    const changedValues = Array.from(changed.values())
     graph
-      .topologicalSort(changedValues)
+      .topologicalSort(Array.from(changed.values()))
       .forEach(property => functions.get(property)());
     changed.clear();
   };
@@ -33,13 +32,21 @@ export default options => {
     return obj;
   }, {});
 
+  const allDefined = properties => properties.every(property => values.get(property))
+
   Object.entries(options).forEach(entry => {
     const [property, value] = entry;
     if (isReactiveFunction(value)) {
       const { fn, inputs } = unpackReactiveFunction(value);
-      inputs.forEach(input => graph.addEdge(input, property));
+
+      inputs.forEach(input => {
+        graph.addEdge(input, property)
+      });
+
       functions.set(property, () => {
-        values.set(property, fn(getAll(inputs)));
+        if (allDefined(inputs)) {
+          values.set(property, fn(getAll(inputs)));
+        }
       });
     } else {
       functions.set(property, () => get(property));

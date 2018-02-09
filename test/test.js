@@ -1,20 +1,20 @@
 const topologica = require('..');
 const assert = require('assert');
 
-describe('Test', function (){
+describe('Test', () => {
 
-  it('Should set and get an initial value.', function (){
+  it('Should set and get an initial value.', () => {
     const dataflow = topologica({ foo: 'bar' });
     assert.equal(dataflow.get('foo'), 'bar');
   });
 
-  it('Should set a value after construction.', function (){
+  it('Should set a value after construction.', () => {
     const dataflow = topologica({ foo: 'bar' });
     dataflow.set({foo: 'baz'});
     assert.equal(dataflow.get('foo'), 'baz');
   });
 
-  it('Should compute a derived property.', function (){
+  it('Should compute a derived property.', () => {
     const dataflow = topologica({
       a: 5,
       b: [({a}) => a + 1, 'a']
@@ -22,14 +22,14 @@ describe('Test', function (){
     assert.equal(dataflow.get('b'), 6);
   });
 
-  it('Should handle uninitialized property.', function (){
+  it('Should handle uninitialized property.', () => {
     const dataflow = topologica({
       b: [({a}) => a + 1, 'a']
     });
     assert.equal(dataflow.get('b'), undefined);
   });
 
-  it('Should propagate changes synchronously.', function (){
+  it('Should propagate changes synchronously.', () => {
     const dataflow = topologica({
       b: [({a}) => a + 1, 'a']
     });
@@ -41,7 +41,7 @@ describe('Test', function (){
     assert.equal(dataflow.get('b'), 100);
   });
 
-  it('Should compute a derived property with 2 hops.', function (){
+  it('Should compute a derived property with 2 hops.', () => {
     const dataflow = topologica({
       a: 5,
       b: [({a}) => a + 1, 'a'],
@@ -50,16 +50,27 @@ describe('Test', function (){
     assert.equal(dataflow.get('c'), 7);
   });
 
-  it('Should handle case of 2 inputs.', function (){
+  it('Should handle case of 2 inputs.', () => {
     const dataflow = topologica({
-      a: 5,
-      b: 8,
-      c: [({a, b}) => a + b, 'a,b']
+      firstName: 'Fred',
+      lastName: 'Flintstone',
+      fullName: [ ({firstName, lastName}) => `${firstName} ${lastName}`, 'firstName, lastName' ]
     });
-    assert.equal(dataflow.get('c'), 13);
+    assert.equal(dataflow.get('fullName'), 'Fred Flintstone');
   });
 
-  it('Should handle case of 3 inputs.', function (){
+  it('Should only execute when all inputs are defined.', () => {
+    const dataflow = topologica({
+      lastName: 'Flintstone',
+      fullName: [ ({firstName, lastName}) => `${firstName} ${lastName}`, 'firstName, lastName' ]
+    });
+    assert.equal(dataflow.get('fullName'), undefined);
+
+    dataflow.set({ firstName: 'Wilma' });
+    assert.equal(dataflow.get('fullName'), 'Wilma Flintstone');
+  });
+
+  it('Should handle case of 3 inputs.', () => {
     const dataflow = topologica({
       a: 5,
       b: 8,
@@ -69,7 +80,7 @@ describe('Test', function (){
     assert.equal(dataflow.get('d'), 15);
   });
 
-  it('Should handle spaces in input string.', function (){
+  it('Should handle spaces in input string.', () => {
     const dataflow = topologica({
       a: 5,
       b: 8,
@@ -87,7 +98,7 @@ describe('Test', function (){
   //   \ /
   //    e   
   //
-  it('Should evaluate not-too-tricky case.', function (){
+  it('Should evaluate not-too-tricky case.', () => {
     const dataflow = topologica({
       a: 1,
       c: 2,
@@ -105,7 +116,7 @@ describe('Test', function (){
   //    c   |
   //     \ /
   //      e   
-  it('Should evaluate tricky case.', function (){
+  it('Should evaluate tricky case.', () => {
     const dataflow = topologica({
       a: 5,
       b: [({a}) => a + 1, 'a'],
@@ -131,7 +142,7 @@ describe('Test', function (){
   //    d   | /
   //     \ / /
   //       h   
-  it('Should evaluate trickier case.', function (){
+  it('Should evaluate trickier case.', () => {
     const dataflow = topologica({
       a: 5,
       b: [({a}) => a + 1, 'a'],
@@ -153,7 +164,7 @@ describe('Test', function (){
     assert.equal(dataflow.get('h'), h);
   });
 });
-//    it("Should work with booleans.", function (){
+//    it("Should work with booleans.", () => {
 //      var my = ReactiveModel()
 //        ("a", 5);
 //      
@@ -171,7 +182,7 @@ describe('Test', function (){
 //      my.destroy();
 //    });
 //
-//    it("Should work with null as assigned value.", function (){
+//    it("Should work with null as assigned value.", () => {
 //      var my = ReactiveModel()
 //        ("a", 5);
 //
@@ -186,7 +197,7 @@ describe('Test', function (){
 //      my.destroy();
 //    });
 //
-//    it("Should work with null as default value.", function (){
+//    it("Should work with null as default value.", () => {
 //      var my = ReactiveModel()
 //        ("a", null);
 //
@@ -210,7 +221,7 @@ describe('Test', function (){
 //      // be invoked asynchronously with the new value for the output property.
 //      my
 //        ("b", function (a, done){
-//          setTimeout(function (){
+//          setTimeout(() => {
 //            done(a + 1);
 //          }, 20);
 //        }, "a")
@@ -300,7 +311,7 @@ describe('Test', function (){
 //      my.destroy();
 //    });
 //
-//    it("Should serialize the data flow graph.", function (){
+//    it("Should serialize the data flow graph.", () => {
 //      var my = ReactiveModel()
 //        ("firstName", "Jane")
 //        ("lastName", "Smith")
@@ -333,7 +344,7 @@ describe('Test', function (){
 //      my.destroy();
 //    });
 //
-//    it("Should support nested digest.", function (){
+//    it("Should support nested digest.", () => {
 //      var my = ReactiveModel()
 //        ("a", 5)
 //        ("b")
@@ -352,9 +363,9 @@ describe('Test', function (){
 //
 //  });
 //
-//  describe("Cleanup", function (){
+//  describe("Cleanup", () => {
 //
-//    it("Should remove synchronous reactive function on destroy.", function (){
+//    it("Should remove synchronous reactive function on destroy.", () => {
 //      var my = ReactiveModel()
 //        ("a", 5)
 //        ("b", increment, "a");
@@ -395,11 +406,11 @@ describe('Test', function (){
 //      }, 10);
 //    });
 //
-//    it("Should remove property listeners on destroy.", function (){
+//    it("Should remove property listeners on destroy.", () => {
 //      var my = ReactiveModel()("a", 50),
 //          a = my.a,
 //          numInvocations = 0;
-//      a.on(function (){ numInvocations++; });
+//      a.on(() => { numInvocations++; });
 //      assert.equal(numInvocations, 1);
 //
 //      my.destroy();
@@ -409,8 +420,8 @@ describe('Test', function (){
 //    });
 //  });
 //
-//  describe("model.link()", function (){
-//    it("Should link between models.", function (){
+//  describe("model.link()", () => {
+//    it("Should link between models.", () => {
 //      var model1 = ReactiveModel()("someOutput", 5);
 //      var model2 = ReactiveModel()("someInput", 10);
 //      var link = ReactiveModel.link(model1.someOutput, model2.someInput);
@@ -426,7 +437,7 @@ describe('Test', function (){
 //    });
 //  });
 //
-//  describe("model.call()", function (){
+//  describe("model.call()", () => {
 //
 //    it("Should support model.call().", function(){
 //
@@ -478,16 +489,16 @@ describe('Test', function (){
 //    });
 //  });
 //
-//  describe("Edge Cases and Error Handling", function (){
+//  describe("Edge Cases and Error Handling", () => {
 //
 //    it("Should throw error when input property is not defined.", function(){
-//      assert.throws(function (){
+//      assert.throws(() => {
 //        ReactiveModel()(function (a){}, "a");
 //      }, /The property "a" was referenced as a dependency for a reactive function before it was defined. Please define each property first before referencing them in reactive functions./);
 //    });
 //
 //    it("Should throw error when output property is already defined.", function(){
-//      assert.throws(function (){
+//      assert.throws(() => {
 //        ReactiveModel()
 //          ("a", 5)
 //          ("a", function (a){}, "a");
@@ -495,7 +506,7 @@ describe('Test', function (){
 //    });
 //
 //    it("Should throw error when newly added property is already defined.", function(){
-//      assert.throws(function (){
+//      assert.throws(() => {
 //        ReactiveModel()
 //          ("b", 5)
 //          ("b", 15);

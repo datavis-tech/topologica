@@ -48,28 +48,42 @@ The real fun part is defining _reactive functions_ that depend on other properti
 const dataflow = topologica({
   firstName: 'Fred',
   lastName: 'Flintstone',
-  fullName: [                                              // Reactive functions are defined by passing an array.
+
+  // Reactive functions are defined by passing an array.
+  fullName: [
     ({firstName, lastName}) => `${firstName} ${lastName}`, // The first element is the function,
     'firstName, lastName'                                  // the second argument is a list of inputs.
   ]
 });
-assert.equal(dataflow.get('b'), 6);
+assert.equal(dataflow.get('fullName'), 'Fred Flintstone');
 ```
 
 Now if either firstName or `lastName` changes, `fullName` will be updated (synchronously).
 
 ```js
 dataflow.set({ firstName: 'Wilma' });
-assert.equal(dataflow.get('fullName'), 6);
+assert.equal(dataflow.get('fullName'), 'Wilma Flintstone');
 ```
 
-Data flow graphs can be arbitrarily compled [directed acyclic graphs](https://en.wikipedia.org/wiki/Directed_acyclic_graph).
+You can use reactive functions to trigger code with side effects, like DOM manipulation:
 
-For more complex cases, have a look at the [tests](/tests).
+```js
+const dataflow = topologica({
+  firstName: 'Fred',
+  lastName: 'Flintstone',
+  fullName: [({firstName, lastName}) => `${firstName} ${lastName}`, 'firstName, lastName' ]
+  fullNameText: [({fullName}) => d3.select('#full-name').text(fullName), 'fullName']
+});
+assert.equal(d3.select('#full-name').text(), 'Fred Flintstone');
+```
+
+Data flow graphs can be arbitrarily complex [directed acyclic graphs](https://en.wikipedia.org/wiki/Directed_acyclic_graph).
+
+For more complex cases, have a look at the [tests](/test/test.js).
 
 ## Contributing
 
-If you have any ideas concerning developer ergonomics, syntactic sugar, or new features we could add, please [open an issue](https://github.com/datavis-tech/topologica/issues). Enjoy!
+If you have any ideas concerning developer ergonomics, syntactic sugar, or new features, please [open an issue](https://github.com/datavis-tech/topologica/issues).
 
 ## Related Work
 
