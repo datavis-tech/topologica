@@ -3,151 +3,21 @@ const assert = require('assert');
 
 describe('Test', function (){
 
-  it('Should set an initial value.', function (){
+  it('Should set and get an initial value.', function (){
     const dataflow = topologica({ foo: 'bar' });
     assert.equal(dataflow.get('foo'), 'bar');
+  });
+
+  it('Should set a value after construction.', function (){
+    const dataflow = topologica({ foo: 'bar' });
+    dataflow.set('foo', 'baz');
+    assert.equal(dataflow.get('foo'), 'baz');
   });
 
 });
 
 
 
-//describe("ReactiveModel", function (){
-//
-//  describe("Adding public properties", function (){
-//
-//    it("Should add a public property and get its value.", function (){
-//      var my = ReactiveModel();
-//      my("x", 5);
-//      assert.equal(my.x(), 5);
-//      my.destroy();
-//    });
-//
-//    it("Should add a public property and set its value.", function (){
-//      var my = ReactiveModel();
-//      my("x", 5);
-//      my.x(10);
-//      assert.equal(my.x(), 10);
-//      my.destroy();
-//    });
-//
-//    it("Should support chaining when setting multiple properties.", function (){
-//      var my = ReactiveModel()
-//        ("x", 5)
-//        ("y", 6);
-//
-//      my.x(10).y(20);
-//
-//      assert.equal(my.x(), 10);
-//      assert.equal(my.y(), 20);
-//      my.destroy();
-//    });
-//
-//    it("Should chain addProperty.", function (){
-//      var my = ReactiveModel()("x", 5);
-//      assert.equal(my.x(), 5);
-//      my.destroy();
-//    });
-//  });
-//
-//  describe("Adding properties", function (){
-//
-//    it("Should add a property and get its value.", function (){
-//      var my = ReactiveModel();
-//      my("x", 5);
-//      assert.equal(my.x(), 5);
-//      my.destroy();
-//    });
-//
-//    it("Should add a property with no default and set its value.", function (){
-//      var my = ReactiveModel();
-//      my("x");
-//      my.x(10);
-//      assert.equal(my.x(), 10);
-//      my.destroy();
-//    });
-//
-//    it("Should support chaining when setting multiple properties.", function (){
-//      var my = ReactiveModel();
-//      my("x", 5);
-//      my("y", 6);
-//
-//      my
-//        .x(10)
-//        .y(20);
-//
-//      assert.equal(my.x(), 10);
-//      assert.equal(my.y(), 20);
-//      my.destroy();
-//    });
-//
-//    it("Should chain addProperty.", function (){
-//      var my = ReactiveModel()
-//        ("x", 5)
-//        ("y", 400);
-//      assert.equal(my.x(), 5);
-//      assert.equal(my.y(), 400);
-//      my.destroy();
-//    });
-//
-//  });
-//
-//  describe("Accessing configuration", function (){
-//
-//    it("Should get configuration.", function (){
-//      var my = ReactiveModel()
-//        ("x", 5).expose()
-//        ("y", 10).expose()
-//        .x(10)
-//        .y(20);
-//
-//      ReactiveModel.digest();
-//
-//      var configuration = my();
-//      assert.equal(Object.keys(configuration).length, 2);
-//      assert.equal(configuration.x, 10);
-//      assert.equal(configuration.y, 20);
-//      my.destroy();
-//    });
-//
-//    it("Should get configuration and omit default values.", function (){
-//      var my = ReactiveModel()
-//        ("x", 5).expose()
-//        ("y", 10).expose();
-//
-//      ReactiveModel.digest();
-//
-//      var configuration = my();
-//      assert.equal(Object.keys(configuration).length, 0);
-//      my.destroy();
-//    });
-//
-//    it("Should set configuration.", function (){
-//
-//      var my = ReactiveModel()
-//        ("x", 5).expose()
-//        ("y", 10).expose();
-//
-//      my({
-//        x: 20,
-//        y: 50
-//      });
-//
-//      assert.equal(my.x(), 20);
-//      assert.equal(my.y(), 50);
-//
-//      my.destroy();
-//    });
-//
-//    it("Should chain setState.", function (){
-//      var my = ReactiveModel()
-//        ("x", 5).expose()
-//        ("y", 10).expose()
-//        ({ x: 20, y: 50 });
-//      assert.equal(my.x(), 20);
-//      assert.equal(my.y(), 50);
-//      my.destroy();
-//    });
 //
 //    it("Should set configuration with default values for omitted properties.", function (){
 //      var my = ReactiveModel()

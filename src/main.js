@@ -10,6 +10,7 @@ export default options => {
   });
 
   return {
-    get: property => values[property]
+    get: property => values[property],
+    set: (property, value) => values[property] = value
   };
 };
