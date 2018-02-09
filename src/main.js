@@ -32,7 +32,7 @@ export default options => {
     return obj;
   }, {});
 
-  const allDefined = properties => properties.every(property => values.get(property))
+  const allDefined = properties => properties.every(property => values.has(property))
 
   Object.entries(options).forEach(entry => {
     const [property, value] = entry;

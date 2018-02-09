@@ -163,6 +163,14 @@ describe('Test', () => {
     const h = d + f + g;
     assert.equal(dataflow.get('h'), h);
   });
+
+  it('Should work with booleans.', () => {
+    const dataflow = topologica({
+      a: false,
+      b: [({a}) => !a, 'a'],
+    });
+    assert.equal(dataflow.get('b'), true);
+  });
 });
 //    it("Should work with booleans.", () => {
 //      var my = ReactiveModel()
