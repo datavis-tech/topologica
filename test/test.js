@@ -10,137 +10,22 @@ describe('Test', function (){
 
   it('Should set a value after construction.', function (){
     const dataflow = topologica({ foo: 'bar' });
-    dataflow.set('foo', 'baz');
+    dataflow.set({foo: 'baz'});
     assert.equal(dataflow.get('foo'), 'baz');
+  });
+
+  it('Should compute a derived property.', function (){
+    const dataflow = topologica({
+      a: 5,
+      b: [({a}) => a + 1, 'a']
+    });
+    assert.equal(dataflow.get('b'), 6);
   });
 
 });
 
 
 
-//
-//    it("Should set configuration with default values for omitted properties.", function (){
-//      var my = ReactiveModel()
-//        ("x", 5).expose()
-//        ("y", 10).expose()
-//        .x(20)
-//        .y(50);
-//
-//      assert.equal(my.x(), 20);
-//      assert.equal(my.y(), 50);
-//
-//      my({});
-//
-//      assert.equal(my.x(), 5);
-//      assert.equal(my.y(), 10);
-//      my.destroy();
-//    });
-//
-//    it("Should set configuration with default values and new values.", function (){
-//      var my = ReactiveModel()
-//        ("x", 5).expose()
-//        ("y", 10).expose()
-//        .x(20)
-//        .y(50);
-//
-//      assert.equal(my.x(), 20);
-//      assert.equal(my.y(), 50);
-//
-//      my({ x: 30 });
-//
-//      assert.equal(my.x(), 30);
-//      assert.equal(my.y(), 10);
-//      my.destroy();
-//    });
-//
-//    it("Should listen for changes in configuration, getting default empty configuration.", function (done){
-//      var my = ReactiveModel()
-//        ("x", 5).expose()
-//        ("y", 10).expose();
-//
-//      my.on(function (newState){
-//        assert.equal(Object.keys(newState).length, 0);
-//        my.destroy();
-//        done();
-//      });
-//    });
-//
-//    it("Should listen for changes in configuration, getting configuration after one change.", function (done){
-//      var my = ReactiveModel()
-//        ("x", 5).expose()
-//        ("y", 10).expose();
-//
-//      my.on(function (newState){
-//        assert.equal(Object.keys(newState).length, 1);
-//        assert.equal(newState.x, 15);
-//        done();
-//        my.destroy();
-//      });
-//
-//      my.x(15);
-//    });
-//
-//    it("Should listen for changes in configuration, getting configuration after two changes.", function (done){
-//      var my = ReactiveModel()
-//        ("x", 5).expose()
-//        ("y", 10).expose();
-//
-//      my.on(function (newState){
-//        assert.equal(Object.keys(newState).length, 2);
-//        assert.equal(newState.x, 15);
-//        assert.equal(newState.y, 45);
-//        my.destroy();
-//        done();
-//      });
-//
-//      my.x(15).y(45);
-//    });
-//
-//    it("Should listen for changes in configuration, getting configuration after two async changes.", function (done){
-//      var my = ReactiveModel()
-//        ("x", 5).expose()
-//        ("z", 10).expose();
-//
-//      my.on(function (newState){
-//        if(my.z() === 10){
-//          assert.equal(Object.keys(newState).length, 1);
-//          assert.equal(newState.x, 15);
-//          my.z(45);
-//        } else {
-//          assert.equal(Object.keys(newState).length, 2);
-//          assert.equal(newState.z, 45);
-//          my.destroy();
-//          done();
-//        }
-//      });
-//
-//      my.x(15);
-//    });
-//
-//    it("Should stop listening for changes in configuration.", function (done){
-//      var my = ReactiveModel()
-//        ("x", 5).expose()
-//        ("y", 10).expose();
-//      var numInvocations = 0;
-//
-//      var listener = my.on(function (newState){
-//        numInvocations++;
-//        if(my.x() === 5){
-//          my.x(50);
-//          my.off(listener);
-//
-//          setTimeout(function (){
-//            assert.equal(numInvocations, 1);
-//            my.destroy();
-//            done();
-//          }, 10);
-//        }
-//      });
-//    });
-//  });
-//
-//  describe("Reactive functions", function (){
-//
 //    it("Should react.", function (){
 //      var my = ReactiveModel()("a", 5);
 //      my("b", increment, "a");
