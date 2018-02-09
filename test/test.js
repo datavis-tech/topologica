@@ -22,208 +22,137 @@ describe('Test', function (){
     assert.equal(dataflow.get('b'), 6);
   });
 
+  it('Should handle uninitialized property.', function (){
+    const dataflow = topologica({
+      b: [({a}) => a + 1, 'a']
+    });
+    assert.equal(dataflow.get('b'), undefined);
+  });
+
+  it('Should propagate changes synchronously.', function (){
+    const dataflow = topologica({
+      b: [({a}) => a + 1, 'a']
+    });
+
+    dataflow.set({a: 2});
+    assert.equal(dataflow.get('b'), 3);
+
+    dataflow.set({a: 99});
+    assert.equal(dataflow.get('b'), 100);
+  });
+
+  it('Should compute a derived property with 2 hops.', function (){
+    const dataflow = topologica({
+      a: 5,
+      b: [({a}) => a + 1, 'a'],
+      c: [({b}) => b + 1, 'b']
+    });
+    assert.equal(dataflow.get('c'), 7);
+  });
+
+  it('Should handle case of 2 inputs.', function (){
+    const dataflow = topologica({
+      a: 5,
+      b: 8,
+      c: [({a, b}) => a + b, 'a,b']
+    });
+    assert.equal(dataflow.get('c'), 13);
+  });
+
+  it('Should handle case of 3 inputs.', function (){
+    const dataflow = topologica({
+      a: 5,
+      b: 8,
+      c: 2,
+      d: [({a, b, c}) => a + b + c, 'a,b,c']
+    });
+    assert.equal(dataflow.get('d'), 15);
+  });
+
+  it('Should handle spaces in input string.', function (){
+    const dataflow = topologica({
+      a: 5,
+      b: 8,
+      c: 2,
+      d: [({a, b, c}) => a + b + c, '  a ,    b, c   ']
+    });
+    assert.equal(dataflow.get('d'), 15);
+  });
+
+  // Data flow graph, read from top to bottom.
+  //
+  //  a   c
+  //  |   |
+  //  b   d
+  //   \ /
+  //    e   
+  //
+  it('Should evaluate not-too-tricky case.', function (){
+    const dataflow = topologica({
+      a: 1,
+      c: 2,
+      b: [({a}) => a + 1, 'a'],
+      d: [({c}) => c + 1, 'c'],
+      e: [({b, d}) => b + d, 'b, d']
+    });
+    assert.equal(dataflow.get('e'), (1 + 1) + (2 + 1));
+  });
+
+  //      a
+  //     / \
+  //    b   |
+  //    |   d
+  //    c   |
+  //     \ /
+  //      e   
+  it('Should evaluate tricky case.', function (){
+    const dataflow = topologica({
+      a: 5,
+      b: [({a}) => a + 1, 'a'],
+      c: [({b}) => b + 1, 'b'],
+      d: [({a}) => a + 1, 'a'],
+      e: [({b, d}) => b + d, 'b, d']
+    });
+    const a = dataflow.get('a');
+    const b = a + 1;
+    const c = b + 1;
+    const d = a + 1;
+    const e = b + d;
+    assert.equal(dataflow.get('e'), e);
+  });
+
+
+  //       a
+  //     / \ \
+  //    b   | \
+  //    |   e  \
+  //    c   |  g
+  //    |   f  /
+  //    d   | /
+  //     \ / /
+  //       h   
+  it('Should evaluate trickier case.', function (){
+    const dataflow = topologica({
+      a: 5,
+      b: [({a}) => a + 1, 'a'],
+      c: [({b}) => b + 1, 'b'],
+      d: [({c}) => c + 1, 'c'],
+      e: [({a}) => a + 1, 'a'],
+      f: [({e}) => e + 1, 'e'],
+      g: [({a}) => a + 1, 'a'],
+      h: [({d, f, g}) => d + f + g, 'd, f, g']
+    });
+    const a = dataflow.get('a');
+    const b = a + 1;
+    const c = b + 1;
+    const d = c + 1;
+    const e = a + 1;
+    const f = e + 1;
+    const g = a + 1;
+    const h = d + f + g;
+    assert.equal(dataflow.get('h'), h);
+  });
 });
-
-
-
-//    it("Should react.", function (){
-//      var my = ReactiveModel()("a", 5);
-//      my("b", increment, "a");
-//      ReactiveModel.digest();
-//      assert.equal(my.b(), 6);
-//      output("ab");
-//      my.destroy();
-//    });
-//
-//    it("Should chain react.", function (){
-//      var my = ReactiveModel()
-//        ("a", 5)
-//        ("b", increment, "a");
-//      ReactiveModel.digest();
-//      assert.equal(my.b(), 6);
-//      my.destroy();
-//    });
-//
-//    it("Should expose chainable digest() on instances.", function (){
-//      var my = ReactiveModel()
-//        ("a", 5)
-//        ("b", increment, "a")
-//        .digest();
-//      assert.equal(my.b(), 6);
-//      my.destroy();
-//    });
-//
-//    it("Should react and use newly set value.", function (){
-//      var my = ReactiveModel()
-//        ("a", 5)
-//        ("b", increment, "a");
-//      my.a(10);
-//      ReactiveModel.digest();
-//      assert.equal(my.b(), 11);
-//      my.destroy();
-//    });
-//
-//    it("Should react with two public input properties.", function (){
-//      var my = ReactiveModel()
-//        ("firstName", "Jane")
-//        ("lastName", "Smith")
-//        ("fullName", function (firstName, lastName){
-//          return firstName + " " + lastName;
-//        }, "firstName, lastName");
-//      ReactiveModel.digest();
-//      assert.equal(my.fullName(), "Jane Smith");
-//      output("full-name");
-//      my.destroy();
-//    });
-//
-//    it("Should react with input properties defined in an array.", function (){
-//      var my = ReactiveModel()
-//        ("firstName", "Jane")
-//        ("lastName", "Smith")
-//        ("fullName", function (firstName, lastName){
-//          return firstName + " " + lastName;
-//        }, ["firstName", "lastName"]);
-//      ReactiveModel.digest();
-//      assert.equal(my.fullName(), "Jane Smith");
-//      my.destroy();
-//    });
-//
-//    it("Should propagate two hops in a single digest.", function (){
-//
-//      var my = ReactiveModel()
-//        ("a", 0)
-//        ("b", increment, "a")
-//        ("c", increment, "b");
-//
-//      my.a(1);
-//      ReactiveModel.digest();
-//
-//      assert.equal(my.a(), 1);
-//      assert.equal(my.b(), 2);
-//      assert.equal(my.c(), 3);
-//
-//      output("abc");
-//
-//      my.destroy();
-//    });
-//
-//    it("Should evaluate not-too-tricky case.", function (){
-//
-//      var my = ReactiveModel()
-//        ("a", 1)
-//        ("c", 2);
-//
-//      // a - b
-//      //       \
-//      //        e
-//      //       /
-//      // c - d
-//
-//      my
-//        ("b", increment, "a")
-//        ("d", increment, "c")
-//        ("e", add, "b, d");
-//
-//      ReactiveModel.digest();
-//
-//      assert.equal(my.e(), (1 + 1) + (2 + 1));
-//
-//      output("not-too-tricky");
-//
-//      my.destroy();
-//    });
-//
-//    it("Should evaluate tricky case.", function (){
-//
-//      //      a
-//      //     / \
-//      //    b   |
-//      //    |   d
-//      //    c   |
-//      //     \ /
-//      //      e   
-//
-//      var my = ReactiveModel()
-//        ("a", 5)
-//        ("b", increment, "a")
-//        ("c", increment, "b")
-//        ("d", increment, "a")
-//        ("e", add, "b, d");
-//
-//      ReactiveModel.digest();
-//
-//      var a = my.a(),
-//          b = a + 1,
-//          c = b + 1,
-//          d = a + 1,
-//          e = b + d;
-//
-//      assert.equal(my.e(), e);
-//
-//      output("tricky-case");
-//
-//      my.destroy();
-//    });
-//
-//    it("Should evaluate trickier case.", function (){
-//
-//      //       a
-//      //     / \ \
-//      //    b   | \
-//      //    |   e  \
-//      //    c   |  g
-//      //    |   f  /
-//      //    d   | /
-//      //     \ / /
-//      //       h   
-//
-//      function add3(x, y, z){ return x + y + z; }
-//
-//      var my = ReactiveModel()
-//        ("a", 5)
-//        ("b", increment, "a")
-//        ("c", increment, "b")
-//        ("d", increment, "c")
-//        ("e", increment, "a")
-//        ("f", increment, "e")
-//        ("g", increment, "a")
-//        ("h", add3, "d, f, g");
-//
-//      ReactiveModel.digest();
-//
-//      var a = my.a(),
-//          b = a + 1,
-//          c = b + 1,
-//          d = c + 1,
-//          e = a + 1,
-//          f = e + 1,
-//          g = a + 1,
-//          h = d + f + g;
-//
-//      assert.equal(my.h(), h);
-//
-//      output("trickier-case");
-//
-//      my.destroy();
-//    });
-//
-//    it("Should auto-digest.", function (done){
-//      var my = ReactiveModel()
-//        ("a", 5)
-//        ("b", increment, "a");
-//
-//      setTimeout(function(){
-//        assert.equal(my.b(), 6);
-//        my.a(10);
-//        assert.equal(my.b(), 6);
-//        setTimeout(function(){
-//          assert.equal(my.b(), 11);
-//          my.destroy();
-//          done();
-//        });
-//      });
-//    });
-//
 //    it("Should work with booleans.", function (){
 //      var my = ReactiveModel()
 //        ("a", 5);
