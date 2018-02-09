@@ -70,3 +70,17 @@ For more complex cases, have a look at the [tests](/tests).
 ## Contributing
 
 If you have any ideas concerning developer ergonomics, syntactic sugar, or new features we could add, please [open an issue](https://github.com/datavis-tech/topologica/issues). Enjoy!
+
+## Related Work
+
+This library is a minimalistic reincarnation of [ReactiveModel](https://github.com/datavis-tech/reactive-model), which is a re-write of its precursor [Model.js](https://github.com/curran/model). The minimalism and synchronous execution are inspired by similar features in [Observable](https://beta.observablehq.com).
+
+Similar initiatives:
+
+ * [Mobx](https://github.com/mobxjs/mobx) Very similar library, with React bindings and more API surface area.
+ * [DVL](https://github.com/vogievetsky/DVL) Early work on reactive data visualizations.
+ * [ZJONSSON/clues](https://github.com/ZJONSSON/clues) A very similar library based on Promises.
+ * [Ember Computed Properties](https://guides.emberjs.com/v2.18.0/object-model/computed-properties/) Similar structure of dependencies and reactivity.
+ * [AngularJS Dependency Injection](https://docs.angularjs.org/guide/di) Inspired the API for reactive functions.
+ * [AngularJS $digest()](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$digest) Inspired the "digest" term.
+ * [RxJS](https://github.com/Reactive-Extensions/RxJS) and [Bacon](https://baconjs.github.io/) Full blown FRP packages.
