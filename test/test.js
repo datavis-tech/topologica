@@ -3,14 +3,11 @@ const assert = require('assert');
 
 describe('Test', function (){
 
-  it('Should do a thing.', function (){
-    assert(true);
-    // const dataflow = topologica({
-    //   a: 0,
-    //   b: [a => a + 1, 'a']
-    // });
-    // assert.equal(dataflow.get('b'), 1);
+  it('Should set an initial value.', function (){
+    const dataflow = topologica({ foo: 'bar' });
+    assert.equal(dataflow.get('foo'), 'bar');
   });
+
 });
 
 
