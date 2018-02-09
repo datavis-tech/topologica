@@ -24,7 +24,7 @@ You can also include the library in a script tag from Unpkg, like this:
 <script src="https://unpkg.com/topologica@0.4.0/dist/topologica.min.js"></script>
 ```
 
-The library weighs 1.7 kB minified.
+The library weighs 1.8 kB minified.
 
 ## Usage
 
