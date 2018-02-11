@@ -26,6 +26,10 @@ You can also include the library in a script tag from Unpkg, like this:
 
 The library weighs 1.8 kB minified.
 
+## Examples
+
+ * [Color Picker Example](https://datavis.tech/edit/09fb48921c454e90aa74d72fbe2eb8a0) - Pick a color with 3 sliders.
+
 ## Usage
 
 You can initialize and get properties like this:
