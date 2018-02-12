@@ -1,4 +1,4 @@
-# topologica
+# Topologica.js
 
 Minimal library for reactive [dataflow programming](https://en.wikipedia.org/wiki/Dataflow_programming).
 
@@ -104,3 +104,4 @@ Similar initiatives:
  * [AngularJS Dependency Injection](https://docs.angularjs.org/guide/di) Inspired the API for reactive functions.
  * [AngularJS $digest()](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$digest) Inspired the "digest" term.
  * [RxJS](https://github.com/Reactive-Extensions/RxJS) and [Bacon](https://baconjs.github.io/) Full blown FRP packages.
+ * [Vue.js Computed Properties](https://vuejs.org/v2/guide/computed.html)
