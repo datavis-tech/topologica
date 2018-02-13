@@ -1,5 +1,6 @@
 export default () => {
   const edges = {};
+  const visited = new Set();
 
   const adjacent = node => edges[node] || [];
 
@@ -14,7 +15,7 @@ export default () => {
   };
 
   const depthFirstSearch = sourceNodes => {
-    const visited = new Set();
+    visited.clear();
     const nodeList = [];
 
     const DFSVisit = node => {

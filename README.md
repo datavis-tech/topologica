@@ -35,32 +35,21 @@ The library weighs 1.8 kB minified.
 
 ## Usage
 
-You can initialize and get properties like this:
-
-```js
-const dataFlow = DataFlowGraph({ foo: 'bar' });
-assert.equal(dataFlow.get('foo'), 'bar');
-```
-
-You can set values like this:
-
-```js
-dataFlow.set({foo: 'baz'});
-assert.equal(dataFlow.get('foo'), 'baz');
-```
-
-The real fun part is defining _reactive functions_ that depend on other properties as inputs.
+You can define _reactive functions_ that depend on other properties as inputs.
 
 ```js
 const dataFlow = DataFlowGraph({
-  firstName: 'Fred',
-  lastName: 'Flintstone',
-
-  fullName: λ(
-    ({firstName, lastName}) => `${firstName} ${lastName}`, // The first argument to ReactiveFunction is the function,
-    'firstName, lastName'                                  // the second argument is a comma delimted list of inputs.
+  fullName: λ(                                             // The symbol λ is an alias for Topologica.ReactiveFunction.
+    ({firstName, lastName}) => `${firstName} ${lastName}`, // The first argument is the function, accepting an object.
+    'firstName, lastName'                                  // The second argument is a comma delimted list of inputs.
   )
 });
+
+dataFlow.set({
+  firstName: 'Fred',
+  lastName: 'Flintstone'
+});
+
 assert.equal(dataFlow.get('fullName'), 'Fred Flintstone');
 ```
 
@@ -75,8 +64,6 @@ You can use reactive functions to trigger code with side effects, like DOM manip
 
 ```js
 const dataFlow = DataFlowGraph({
-  firstName: 'Fred',
-  lastName: 'Flintstone',
   fullName: λ(
     ({firstName, lastName}) => `${firstName} ${lastName}`,
     'firstName, lastName'
