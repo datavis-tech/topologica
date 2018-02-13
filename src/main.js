@@ -2,7 +2,7 @@ import Graph from './graph'
 import isReactiveFunction from './isReactiveFunction'
 import unpackReactiveFunction from './unpackReactiveFunction'
 
-export default options => {
+export const DataFlowGraph = options => {
   const values = new Map();
   const changed = new Set();
   const functions = new Map();
@@ -58,3 +58,5 @@ export default options => {
 
   return { set, get };
 };
+
+export const ReactiveFunction = (fn, inputsStr) => [fn, inputsStr]
