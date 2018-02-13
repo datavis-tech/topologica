@@ -3,23 +3,22 @@ const assert = require('assert');
 
 const { DataFlowGraph, ReactiveFunction: λ } = Topologica;
 
-describe('Test', () => {
+describe('Topologica.js', () => {
 
-  it('Should set and get an initial value.', () => {
-    const dataFlow = DataFlowGraph({ foo: 'bar' });
+  it('Should set and get a value.', () => {
+    const dataFlow = DataFlowGraph();
+    dataFlow.set({
+      foo: 'bar'
+    });
     assert.equal(dataFlow.get('foo'), 'bar');
-  });
-
-  it('Should set a value after construction.', () => {
-    const dataFlow = DataFlowGraph({ foo: 'bar' });
-    dataFlow.set({foo: 'baz'});
-    assert.equal(dataFlow.get('foo'), 'baz');
   });
 
   it('Should compute a derived property.', () => {
     const dataFlow = DataFlowGraph({
-      a: 5,
       b: λ(({a}) => a + 1, 'a')
+    });
+    dataFlow.set({
+      a: 5
     });
     assert.equal(dataFlow.get('b'), 6);
   });
@@ -36,58 +35,81 @@ describe('Test', () => {
       b: λ(({a}) => a + 1, 'a')
     });
 
-    dataFlow.set({a: 2});
+    dataFlow.set({
+      a: 2
+    });
     assert.equal(dataFlow.get('b'), 3);
 
-    dataFlow.set({a: 99});
+    dataFlow.set({
+      a: 99
+    });
     assert.equal(dataFlow.get('b'), 100);
   });
 
   it('Should compute a derived property with 2 hops.', () => {
     const dataFlow = DataFlowGraph({
-      a: 5,
       b: λ(({a}) => a + 1, 'a'),
       c: λ(({b}) => b + 1, 'b')
+    });
+    dataFlow.set({
+      a: 5
     });
     assert.equal(dataFlow.get('c'), 7);
   });
 
   it('Should handle case of 2 inputs.', () => {
     const dataFlow = DataFlowGraph({
+      fullName: λ(
+        ({firstName, lastName}) => `${firstName} ${lastName}`,
+        'firstName, lastName'
+      )
+    });
+    dataFlow.set({
       firstName: 'Fred',
-      lastName: 'Flintstone',
-      fullName: λ(({firstName, lastName}) => `${firstName} ${lastName}`, 'firstName, lastName' )
+      lastName: 'Flintstone'
     });
     assert.equal(dataFlow.get('fullName'), 'Fred Flintstone');
   });
 
   it('Should only execute when all inputs are defined.', () => {
     const dataFlow = DataFlowGraph({
-      lastName: 'Flintstone',
-      fullName: λ(({firstName, lastName}) => `${firstName} ${lastName}`, 'firstName, lastName' )
+      fullName: λ(
+        ({firstName, lastName}) => `${firstName} ${lastName}`,
+        'firstName, lastName'
+      )
+    });
+
+    dataFlow.set({
+      lastName: 'Flintstone'
     });
     assert.equal(dataFlow.get('fullName'), undefined);
 
-    dataFlow.set({ firstName: 'Wilma' });
+    dataFlow.set({
+      firstName: 'Wilma'
+    });
     assert.equal(dataFlow.get('fullName'), 'Wilma Flintstone');
   });
 
   it('Should handle case of 3 inputs.', () => {
     const dataFlow = DataFlowGraph({
+      d: λ(({a, b, c}) => a + b + c, 'a,b,c')
+    });
+    dataFlow.set({
       a: 5,
       b: 8,
-      c: 2,
-      d: λ(({a, b, c}) => a + b + c, 'a,b,c')
+      c: 2
     });
     assert.equal(dataFlow.get('d'), 15);
   });
 
   it('Should handle spaces in input string.', () => {
     const dataFlow = DataFlowGraph({
+      d: λ(({a, b, c}) => a + b + c, '  a ,    b, c   ')
+    });
+    dataFlow.set({
       a: 5,
       b: 8,
-      c: 2,
-      d: λ(({a, b, c}) => a + b + c, '  a ,    b, c   ')
+      c: 2
     });
     assert.equal(dataFlow.get('d'), 15);
   });
@@ -102,11 +124,13 @@ describe('Test', () => {
   //
   it('Should evaluate not-too-tricky case.', () => {
     const dataFlow = DataFlowGraph({
-      a: 1,
-      c: 2,
       b: λ(({a}) => a + 1, 'a'),
       d: λ(({c}) => c + 1, 'c'),
       e: λ(({b, d}) => b + d, 'b, d')
+    });
+    dataFlow.set({
+      a: 1,
+      c: 2
     });
     assert.equal(dataFlow.get('e'), (1 + 1) + (2 + 1));
   });
@@ -120,11 +144,13 @@ describe('Test', () => {
   //      e   
   it('Should evaluate tricky case.', () => {
     const dataFlow = DataFlowGraph({
-      a: 5,
       b: λ(({a}) => a + 1, 'a'),
       c: λ(({b}) => b + 1, 'b'),
       d: λ(({a}) => a + 1, 'a'),
       e: λ(({b, d}) => b + d, 'b, d')
+    });
+    dataFlow.set({
+      a: 5
     });
     const a = dataFlow.get('a');
     const b = a + 1;
@@ -146,7 +172,6 @@ describe('Test', () => {
   //       h   
   it('Should evaluate trickier case.', () => {
     const dataFlow = DataFlowGraph({
-      a: 5,
       b: λ(({a}) => a + 1, 'a'),
       c: λ(({b}) => b + 1, 'b'),
       d: λ(({c}) => c + 1, 'c'),
@@ -154,6 +179,9 @@ describe('Test', () => {
       f: λ(({e}) => e + 1, 'e'),
       g: λ(({a}) => a + 1, 'a'),
       h: λ(({d, f, g}) => d + f + g, 'd, f, g')
+    });
+    dataFlow.set({
+      a: 5
     });
     const a = dataFlow.get('a');
     const b = a + 1;
@@ -168,8 +196,10 @@ describe('Test', () => {
 
   it('Should work with booleans.', () => {
     const dataFlow = DataFlowGraph({
-      a: false,
-      b: λ(({a}) => !a, 'a'),
+      b: λ(({a}) => !a, 'a')
+    });
+    dataFlow.set({
+      a: false
     });
     assert.equal(dataFlow.get('b'), true);
   });
