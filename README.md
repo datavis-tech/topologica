@@ -83,7 +83,9 @@ const dataFlow = DataFlowGraph({
 assert.equal(d3.select('#full-name').text(), 'Fred Flintstone');
 ```
 
-Data flow graphs can be arbitrarily complex [directed acyclic graphs](https://en.wikipedia.org/wiki/Directed_acyclic_graph). Here's the tricky case, where breadth-first propagation fails but topological sorting succeeds.
+Data flow graphs can be arbitrarily complex [directed acyclic graphs](https://en.wikipedia.org/wiki/Directed_acyclic_graph).
+
+Here's the tricky case, where breadth-first propagation fails but topological sorting succeeds.
 
 <p align="center">
   <img src="https://cloud.githubusercontent.com/assets/68416/15400254/7f779c9a-1e08-11e6-8992-9d2362bfba63.png">
