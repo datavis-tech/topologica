@@ -92,11 +92,17 @@ Data flow graphs can be arbitrarily complex [directed acyclic graphs](https://en
 ```js
 const dataFlow = DataFlowGraph({
   b: λ(({a}) => a + 1, 'a'),
-  d: λ(({c}) => c + 1, 'c'),
+  c: λ(({b}) => b + 1, 'b'),
+  d: λ(({a}) => a + 1, 'a'),
   e: λ(({b, d}) => b + d, 'b, d')
 });
-dataFlow.set({ a: 1, c: 2 });
-assert.equal(dataFlow.get('e'), (1 + 1) + (2 + 1));
+dataFlow.set({ a: 5 });
+const a = 5;
+const b = a + 1;
+const c = b + 1;
+const d = a + 1;
+const e = b + d;
+assert.equal(dataFlow.get('e'), e);
 ```
 
 For more complex cases, have a look at the [tests](/test/test.js).
