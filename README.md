@@ -1,7 +1,15 @@
 # Topologica.js
 Minimal library for reactive [dataflow programming](https://en.wikipedia.org/wiki/Dataflow_programming).
 
-This library provides an abstraction for **reactive data flows**. This means you can define functions in terms of their inputs (dependencies) and outputs, and the library will take care of executing _only_ the required functions to propagate changes through the data flow graph. Changes are propagated through the data flow graph using the [topological sorting algorithm](https://en.wikipedia.org/wiki/Topological_sorting) (hence the name _Topologica_).
+This library provides an abstraction for **reactive data flows**. This means you can define functions in terms of their inputs (dependencies) and outputs, and the library will take care of executing _only_ the required functions to propagate changes through the data flow graph, in the correct order. The ordering of change propagation through the data flow graph is determined using the [topological sorting algorithm](https://en.wikipedia.org/wiki/Topological_sorting) (hence the name _Topologica_).
+
+Why use topological sorting? In the following data flow graph, propagation using [breadth-first search](https://en.wikipedia.org/wiki/Breadth-first_search) (which is what [Model.js](https://github.com/curran/model) and some other libraries use) would cause `e` to be set twice, and the first time it would be set with an *inconsistent state* (as occurs with ["glitches" in reactive programming](https://en.wikipedia.org/wiki/Reactive_programming#Glitches)). Using topological sorting for change propagation guarantees that `e` will only be set once, and there will never be inconsistent states.
+
+<p align="center">
+  <img src="https://cloud.githubusercontent.com/assets/68416/15400254/7f779c9a-1e08-11e6-8992-9d2362bfba63.png">
+  <br>
+  The tricky case, where breadth-first propagation fails but topological sorting succeeds.
+</p>
 
 ## Installing
 
@@ -75,7 +83,21 @@ const dataFlow = DataFlowGraph({
 assert.equal(d3.select('#full-name').text(), 'Fred Flintstone');
 ```
 
-Data flow graphs can be arbitrarily complex [directed acyclic graphs](https://en.wikipedia.org/wiki/Directed_acyclic_graph).
+Data flow graphs can be arbitrarily complex [directed acyclic graphs](https://en.wikipedia.org/wiki/Directed_acyclic_graph). Here's the tricky case, where breadth-first propagation fails but topological sorting succeeds.
+
+<p align="center">
+  <img src="https://cloud.githubusercontent.com/assets/68416/15400254/7f779c9a-1e08-11e6-8992-9d2362bfba63.png">
+</p>
+
+```js
+const dataFlow = DataFlowGraph({
+  b: λ(({a}) => a + 1, 'a'),
+  d: λ(({c}) => c + 1, 'c'),
+  e: λ(({b, d}) => b + d, 'b, d')
+});
+dataFlow.set({ a: 1, c: 2 });
+assert.equal(dataFlow.get('e'), (1 + 1) + (2 + 1));
+```
 
 For more complex cases, have a look at the [tests](/test/test.js).
 
