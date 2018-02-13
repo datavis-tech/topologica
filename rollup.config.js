@@ -5,7 +5,7 @@ export default {
   input: 'src/main.js',
   output: {
     format: 'umd',
-    name: 'topologica',
+    name: 'Topologica',
     file: pkg.main
   },
   plugins: [
