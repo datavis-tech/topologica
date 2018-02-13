@@ -1,6 +1,6 @@
 # Topologica.js
 
-Minimal library for reactive [dataflow programming](https://en.wikipedia.org/wiki/Dataflow_programming).
+Minimal library for reactive [dataFlow programming](https://en.wikipedia.org/wiki/Dataflow_programming).
 
 This library provides an abstraction for **reactive data flows**. This means you can define functions in terms of their inputs (dependencies) and outputs, and the library will take care of executing _only_ the required functions to propagate changes through the data flow graph. Changes are propagated through the data flow graph using the [topological sorting algorithm](https://en.wikipedia.org/wiki/Topological_sorting) (hence the name _Topologica_).
 
@@ -15,13 +15,16 @@ npm install --save-dev topologica
 Then import it into your code like this:
 
 ```js
-import topologica from 'topologica';
+import { DataFlowGraph, ReactiveFunction as λ } from 'topologica';
 ```
 
 You can also include the library in a script tag from Unpkg, like this:
 
 ```
 <script src="https://unpkg.com/topologica@0.6.0/dist/topologica.min.js"></script>
+<script>
+  const { DataFlowGraph, ReactiveFunction: λ } = Topologica;
+</script>
 ```
 
 The library weighs 1.8 kB minified.
@@ -35,48 +38,53 @@ The library weighs 1.8 kB minified.
 You can initialize and get properties like this:
 
 ```js
-const dataflow = topologica({ foo: 'bar' });
-assert.equal(dataflow.get('foo'), 'bar');
+const dataFlow = DataFlowGraph({ foo: 'bar' });
+assert.equal(dataFlow.get('foo'), 'bar');
 ```
 
 You can set values like this:
 
 ```js
-dataflow.set({foo: 'baz'});
-assert.equal(dataflow.get('foo'), 'baz');
+dataFlow.set({foo: 'baz'});
+assert.equal(dataFlow.get('foo'), 'baz');
 ```
 
 The real fun part is defining _reactive functions_ that depend on other properties as inputs.
 
 ```js
-const dataflow = topologica({
+const dataFlow = DataFlowGraph({
   firstName: 'Fred',
   lastName: 'Flintstone',
 
-  // Reactive functions are defined by passing an array.
-  fullName: [
-    ({firstName, lastName}) => `${firstName} ${lastName}`, // The first element is the function,
-    'firstName, lastName'                                  // the second argument is a list of inputs.
-  ]
+  fullName: λ(
+    ({firstName, lastName}) => `${firstName} ${lastName}`, // The first argument to ReactiveFunction is the function,
+    'firstName, lastName'                                  // the second argument is a comma delimted list of inputs.
+  )
 });
-assert.equal(dataflow.get('fullName'), 'Fred Flintstone');
+assert.equal(dataFlow.get('fullName'), 'Fred Flintstone');
 ```
 
 Now if either firstName or `lastName` changes, `fullName` will be updated (synchronously).
 
 ```js
-dataflow.set({ firstName: 'Wilma' });
-assert.equal(dataflow.get('fullName'), 'Wilma Flintstone');
+dataFlow.set({ firstName: 'Wilma' });
+assert.equal(dataFlow.get('fullName'), 'Wilma Flintstone');
 ```
 
 You can use reactive functions to trigger code with side effects, like DOM manipulation:
 
 ```js
-const dataflow = topologica({
+const dataFlow = DataFlowGraph({
   firstName: 'Fred',
   lastName: 'Flintstone',
-  fullName: [({firstName, lastName}) => `${firstName} ${lastName}`, 'firstName, lastName' ]
-  fullNameText: [({fullName}) => d3.select('#full-name').text(fullName), 'fullName']
+  fullName: λ(
+    ({firstName, lastName}) => `${firstName} ${lastName}`,
+    'firstName, lastName'
+  )
+  fullNameText: λ(
+    ({fullName}) => d3.select('#full-name').text(fullName),
+    'fullName'
+  )
 });
 assert.equal(d3.select('#full-name').text(), 'Fred Flintstone');
 ```
