@@ -129,3 +129,4 @@ Similar initiatives:
  * [AngularJS $digest()](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$digest) Inspired the "digest" term.
  * [RxJS](https://github.com/Reactive-Extensions/RxJS) and [Bacon](https://baconjs.github.io/) Full blown FRP packages.
  * [Vue.js Computed Properties](https://vuejs.org/v2/guide/computed.html)
+ * [Vega Dataflow](https://github.com/vega/vega-dataflow)
