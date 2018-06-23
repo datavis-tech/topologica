@@ -1,5 +1,7 @@
 import Graph from './graph'
 
+const isPromise = output => output && typeof output.then === 'function';
+
 export const DataFlowGraph = options => {
   const values = new Map();
   const changed = new Set();
@@ -41,7 +43,13 @@ export const DataFlowGraph = options => {
 
       functions.set(property, () => {
         if (allDefined(inputs)) {
-          values.set(property, fn(getAll(inputs)));
+          const output = fn(getAll(inputs));
+          if (isPromise(output)) {
+            //values.set(property, undefined);
+            output.then(value => set({[property]: value}));
+          } else {
+            values.set(property, output);
+          }
         }
       });
     });
