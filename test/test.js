@@ -220,4 +220,33 @@ describe('Topologica.js', () => {
     });
     dataFlow.set({ a: 5 });
   });
+
+  it('Should work with Promises correctly.', done => {
+    let invocations = 0;
+    const dataFlow = DataFlowGraph({
+      b: λ(
+        ({a}) => new Promise(resolve => {
+          setTimeout(() => resolve(a + 5), 100)
+        }),
+        'a'
+      ),
+      c: λ(
+        ({b}) => {
+          invocations++;
+          if (b === 10) { // First invocation
+            assert.equal(invocations, 1);
+            setTimeout(() => {
+              dataFlow.set({ a: 100 });
+            }, 10);
+          } else { // Second invocation
+            assert.equal(b, 105);
+            assert.equal(invocations, 2);
+            done();
+          }
+        },
+        'b'
+      )
+    });
+    dataFlow.set({ a: 5 });
+  });
 });

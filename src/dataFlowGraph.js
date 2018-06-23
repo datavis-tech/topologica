@@ -44,9 +44,12 @@ export const DataFlowGraph = options => {
       functions.set(property, () => {
         if (allDefined(inputs)) {
           const output = fn(getAll(inputs));
-          isPromise(output)
-            ? output.then(value => set({[property]: value}))
-            : values.set(property, output);
+          if (isPromise(output)) {
+            //values.set(property, undefined);
+            output.then(value => set({[property]: value}));
+          } else {
+            values.set(property, output);
+          }
         }
       });
     });
