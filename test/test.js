@@ -203,4 +203,21 @@ describe('Topologica.js', () => {
     });
     assert.equal(dataFlow.get('b'), true);
   });
+
+  it('Should work with Promises.', done => {
+    const dataFlow = DataFlowGraph({
+      b: λ(
+        ({a}) => Promise.resolve(a + 5),
+        'a'
+      ),
+      c: λ(
+        ({b}) => {
+          assert.equal(b, 10);
+          done();
+        },
+        'b'
+      )
+    });
+    dataFlow.set({ a: 5 });
+  });
 });
