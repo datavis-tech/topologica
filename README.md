@@ -1,5 +1,5 @@
 # Topologica.js
-Minimal library for reactive [dataflow programming](https://en.wikipedia.org/wiki/Dataflow_programming).
+Small (2 kB minified) library for [reactive](https://en.wikipedia.org/wiki/Reactive_programming) [dataflow programming](https://en.wikipedia.org/wiki/Dataflow_programming).
 
 This library provides an abstraction for **reactive data flows**. This means you can define functions in terms of their inputs (dependencies) and outputs, and the library will take care of executing _only_ the required functions to propagate changes through the data flow graph, in the correct order. The ordering of change propagation through the data flow graph is determined using the [topological sorting algorithm](https://en.wikipedia.org/wiki/Topological_sorting) (hence the name _Topologica_).
 
@@ -34,21 +34,78 @@ You can also include the library in a script tag from Unpkg, like this:
 </script>
 ```
 
-The library weighs 1.8 kB minified.
-
 ## Examples
 
  * [Color Picker Example](https://datavis.tech/edit/09fb48921c454e90aa74d72fbe2eb8a0) - Pick a color with 3 sliders.
 
 ## Usage
 
-You can define _reactive functions_ that depend on other properties as inputs.
+You can define _reactive functions_ that compute properties that depend on other properties as input. For example, consider the following example where `b` gets set to `a + 1` whenever `a` changes.
+
+```javascript
+const dataFlow = DataFlowGraph({
+  b: λ(
+    ({a}) => a + 1,
+    'a'
+  )
+});
+dataFlow.set({ a: 2 });
+assert.equal(dataFlow.get('b'), 3);
+```
+
+<p align="center">
+  <img src="https://cloud.githubusercontent.com/assets/68416/15453189/89c06740-2029-11e6-940b-58207a1492ca.png">
+  <br>
+  When a changes, b gets updated.
+</p>
+
+Here's an example that assigns `b = a + 1` and `c = b + 1`.
+
+```javascript
+const dataFlow = DataFlowGraph({
+  b: λ(({a}) => a + 1, 'a'),
+  c: λ(({b}) => b + 1, 'b')
+});
+dataFlow.set({ a: 5 });
+assert.equal(dataFlow.get('c'), 7);
+```
+
+<p align="center">
+  <img src="https://cloud.githubusercontent.com/assets/68416/15385597/44a10522-1dc0-11e6-9054-2150f851db46.png">
+  <br>
+  Here, b is both an output and an input.
+</p>
+
+Here's an example that uses an asynchronous function.
+
+```javascript
+const dataFlow = DataFlowGraph({
+  b: λ(
+    async ({a}) => await Promise.resolve(a + 5),
+    'a'
+  ),
+  c: λ(
+    ({b}) => assert.equal(b, 10),
+    'b'
+  )
+});
+dataFlow.set({ a: 5 });
+```
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/68416/41818527-7e41eba6-77ce-11e8-898a-9f85de1563ed.png">
+  <br>
+  Asynchronous functions cut the dependency graph.
+</p>
+
+Here's an example that computes a person's full name from their first name and and last name.
 
 ```js
+const { DataFlowGraph, ReactiveFunction: λ } = Topologica;
 const dataFlow = DataFlowGraph({
-  fullName: λ(                                             // The symbol λ is an alias for Topologica.ReactiveFunction.
-    ({firstName, lastName}) => `${firstName} ${lastName}`, // The first argument is the function, accepting an object.
-    'firstName, lastName'                                  // The second argument is a comma delimted list of inputs.
+  fullName: λ(
+    ({firstName, lastName}) => `${firstName} ${lastName}`,
+    'firstName, lastName'
   )
 });
 
@@ -66,6 +123,12 @@ Now if either firstName or `lastName` changes, `fullName` will be updated (synch
 dataFlow.set({ firstName: 'Wilma' });
 assert.equal(dataFlow.get('fullName'), 'Wilma Flintstone');
 ```
+
+<p align="center">
+  <img src="https://cloud.githubusercontent.com/assets/68416/15389922/cf3f24dc-1dd6-11e6-92d6-058051b752ea.png">
+  <br>
+  The data flow graph for the example code above.
+</p>
 
 You can use reactive functions to trigger code with side effects, like DOM manipulation:
 
