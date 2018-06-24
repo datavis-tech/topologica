@@ -28,7 +28,7 @@ import { DataFlowGraph, ReactiveFunction as λ } from 'topologica';
 You can also include the library in a script tag from Unpkg, like this:
 
 ```html
-<script src="https://unpkg.com/topologica@1.0.0/dist/topologica.min.js"></script>
+<script src="https://unpkg.com/topologica@1.1.0/dist/topologica.min.js"></script>
 <script>
   const { DataFlowGraph, ReactiveFunction: λ } = Topologica;
 </script>
