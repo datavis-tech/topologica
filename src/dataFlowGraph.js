@@ -1,5 +1,7 @@
 import Graph from './graph'
 
+const isAsync = fn => fn && fn.constructor.name === 'AsyncFunction';
+
 export const DataFlowGraph = options => {
   const values = new Map();
   const changed = new Set();
@@ -35,13 +37,18 @@ export const DataFlowGraph = options => {
     Object.entries(options).forEach(entry => {
       const [ property, { fn, inputs } ] = entry;
 
+      const propertySync = isAsync(fn) ? property + "'" : property;
+
       inputs.forEach(input => {
-        graph.addEdge(input, property);
+        graph.addEdge(input, propertySync);
       });
 
-      functions.set(property, () => {
+      functions.set(propertySync, () => {
         if (allDefined(inputs)) {
-          values.set(property, fn(getAll(inputs)));
+          const output = fn(getAll(inputs));
+          isAsync(fn)
+            ? output.then(value => set({[property]: value}))
+            : values.set(property, output);
         }
       });
     });
