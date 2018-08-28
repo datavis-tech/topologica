@@ -31,8 +31,11 @@ const Topologica = options => {
 
   const get = values.get.bind(values);
 
-  const getAll = properties => properties
-    .reduce((obj, property) => (obj[property] = get(property), obj), {});
+  const getAll = properties =>
+    properties.reduce((accumulator, property) => {
+      accumulator[property] = get(property);
+      return accumulator;
+    }, {});
 
   const allDefined = properties => properties
     .every(values.has, values);
