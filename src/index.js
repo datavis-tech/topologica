@@ -1,6 +1,6 @@
 import Graph from './graph'
 
-const isAsync = fn => fn && fn.constructor.name === 'AsyncFunction';
+const isAsync = fn => fn.constructor.name === 'AsyncFunction';
 
 const Topologica = options => {
   const values = new Map();
@@ -11,7 +11,9 @@ const Topologica = options => {
   const digest = () => {
     graph
       .topologicalSort(Array.from(changed.values()))
-      .forEach(property => functions.get(property)());
+      .forEach(property => {
+        functions.get(property)();
+      });
     changed.clear();
   };
 
@@ -27,7 +29,7 @@ const Topologica = options => {
     digest();
   };
 
-  const get = property => values.get(property);
+  const get = values.get.bind(values);
 
   const getAll = properties => properties
     .reduce((obj, property) => (obj[property] = get(property), obj), {});
@@ -49,7 +51,9 @@ const Topologica = options => {
         if (allDefined(dependencies)) {
           const output = fn(getAll(dependencies));
           isAsync(fn)
-            ? output.then(value => set({[property]: value}))
+            ? output.then(value => {
+              set({[property]: value});
+            })
             : values.set(property, output);
         }
       });
