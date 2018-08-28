@@ -15,7 +15,6 @@ export default () => {
 
   const depthFirstSearch = sourceNodes => {
     const visited = new Set();
-
     const nodeList = [];
 
     function DFSVisit(node) {

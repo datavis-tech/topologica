@@ -55,7 +55,9 @@ const Topologica = options => {
           const output = fn(getAll(dependencies));
           isAsync(fn)
             ? output.then(value => {
-              set({[property]: value});
+              set({
+                [property]: value
+              });
             })
             : values.set(property, output);
         }
