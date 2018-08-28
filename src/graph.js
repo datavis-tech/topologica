@@ -17,7 +17,6 @@ export default () => {
   const depthFirstSearch = sourceNodes => {
     visited.clear();
     const nodeList = [];
-
     const DFSVisit = node => {
       if (!visited.has(node)) {
         visited.add(node);
@@ -25,19 +24,19 @@ export default () => {
         nodeList.push(node);
       }
     };
-
     sourceNodes.forEach(visited.add, visited);
-
-    sourceNodes.forEach(node => 
+    sourceNodes.forEach(node => {
       adjacent(node).forEach(DFSVisit)
-    );
-
+    });
     return nodeList;
   }
 
-  const topologicalSort = sourceNodes => {
-    return depthFirstSearch(sourceNodes).reverse();
-  };
+  const topologicalSort = sourceNodes =>
+    depthFirstSearch(sourceNodes)
+      .reverse();
 
-  return { addEdge, topologicalSort };
+  return {
+    addEdge,
+    topologicalSort
+  };
 }

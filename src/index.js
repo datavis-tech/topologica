@@ -2,7 +2,7 @@ import Graph from './graph'
 
 const isAsync = fn => fn && fn.constructor.name === 'AsyncFunction';
 
-export const DataFlowGraph = options => {
+const Topologica = options => {
   const values = new Map();
   const changed = new Set();
   const functions = new Map();
@@ -56,3 +56,5 @@ export const DataFlowGraph = options => {
 
   return { set, get };
 };
+
+export default Topologica;
