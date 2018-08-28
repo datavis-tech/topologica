@@ -259,4 +259,30 @@ describe('Topologica.js', () => {
     state.set({ a: 99 });
     assert.equal(invocations, 2);
   });
+
+  it('Should be fast.', () => {
+    const state = Topologica({
+      b: λ(({a}) => a + 1, 'a'),
+      c: λ(({b}) => b + 1, 'b'),
+      d: λ(({c}) => c + 1, 'c'),
+      e: λ(({a}) => a + 1, 'a'),
+      f: λ(({e}) => e + 1, 'e'),
+      g: λ(({a}) => a + 1, 'a'),
+      h: λ(({d, f, g}) => d + f + g, 'd, f, g')
+    });
+    const numRuns = 10;
+    let totalTime = 0;
+    for(let j = 0; j < numRuns; j++){
+      const begin = Date.now();
+      for(let i = 0; i < 200000; i++){
+        state.set({ a: i });
+      }
+      const end = Date.now();
+      const time = end - begin;
+      totalTime += time;
+      console.log(time);
+    }
+    console.log('Average: ' + (totalTime / numRuns));
+    // 468.9
+  }).timeout(7000);
 });

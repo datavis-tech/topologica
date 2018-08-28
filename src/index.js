@@ -4,16 +4,18 @@ const isAsync = fn => fn.constructor.name === 'AsyncFunction';
 
 const Topologica = options => {
   const values = new Map();
-  const changed = new Set();
   const functions = new Map();
   const graph = Graph();
+  const changed = new Set();
+
+  const invoke = property => {
+    functions.get(property)();
+  };
 
   const digest = () => {
     graph
       .topologicalSort(Array.from(changed.values()))
-      .forEach(property => {
-        functions.get(property)();
-      });
+      .forEach(invoke);
     changed.clear();
   };
 
