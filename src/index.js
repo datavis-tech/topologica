@@ -4,9 +4,10 @@ const isAsync = fn => fn.constructor.name === 'AsyncFunction';
 
 const Topologica = options => {
   const values = new Map();
-  let changed = new Set();
   const functions = new Map();
   const graph = Graph();
+
+  let changed = new Set();
 
   const invoke = property => {
     functions.get(property)();
