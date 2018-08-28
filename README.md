@@ -24,16 +24,13 @@ npm install --save-dev topologica
 Then import it into your code like this:
 
 ```js
-import { DataFlowGraph, ReactiveFunction as λ } from 'topologica';
+import Topologica from 'topologica';
 ```
 
 You can also include the library in a script tag from Unpkg, like this:
 
 ```html
-<script src="https://unpkg.com/topologica@1.1.0/dist/topologica.min.js"></script>
-<script>
-  const { DataFlowGraph, ReactiveFunction: λ } = Topologica;
-</script>
+<script src="https://unpkg.com/topologica@2.0.0/dist/topologica.min.js"></script>
 ```
 
 ## Examples
@@ -45,14 +42,13 @@ You can also include the library in a script tag from Unpkg, like this:
 You can define _reactive functions_ that compute properties that depend on other properties as input. For example, consider the following example where `b` gets set to `a + 1` whenever `a` changes.
 
 ```javascript
-const dataFlow = DataFlowGraph({
-  b: λ(
-    ({a}) => a + 1,
-    'a'
-  )
-});
-dataFlow.set({ a: 2 });
-assert.equal(dataFlow.get('b'), 3);
+const b = ({a}) => a + 1;
+b.dependencies = ['a'];
+
+const state = Topologica({ b });
+
+state.set({ a: 2 });
+assert.equal(state.get('b'), 3);
 ```
 
 <p align="center">
@@ -64,12 +60,16 @@ assert.equal(dataFlow.get('b'), 3);
 Here's an example that assigns `b = a + 1` and `c = b + 1`.
 
 ```javascript
-const dataFlow = DataFlowGraph({
-  b: λ(({a}) => a + 1, 'a'),
-  c: λ(({b}) => b + 1, 'b')
-});
-dataFlow.set({ a: 5 });
-assert.equal(dataFlow.get('c'), 7);
+const b = ({a}) => a + 1
+b.dependencies = ['a'];
+
+const c = ({b}) => b + 1;
+c.dependencies = ['b'];
+
+const state = Topologica({ b, c });
+
+state.set({ a: 5 });
+assert.equal(state.get('c'), 7);
 ```
 
 <p align="center">
@@ -81,7 +81,8 @@ assert.equal(dataFlow.get('c'), 7);
 Here's an example that uses an asynchronous function.
 
 ```javascript
-const dataFlow = DataFlowGraph({
+
+const state = Topologica({
   b: λ(
     async ({a}) => await Promise.resolve(a + 5),
     'a'
@@ -91,7 +92,7 @@ const dataFlow = DataFlowGraph({
     'b'
   )
 });
-dataFlow.set({ a: 5 });
+state.set({ a: 5 });
 ```
 
 <p align="center">
@@ -103,27 +104,27 @@ dataFlow.set({ a: 5 });
 Here's an example that computes a person's full name from their first name and and last name.
 
 ```js
-const { DataFlowGraph, ReactiveFunction: λ } = Topologica;
-const dataFlow = DataFlowGraph({
+const { Topologica, ReactiveFunction: λ } = Topologica;
+const state = Topologica({
   fullName: λ(
     ({firstName, lastName}) => `${firstName} ${lastName}`,
     'firstName, lastName'
   )
 });
 
-dataFlow.set({
+state.set({
   firstName: 'Fred',
   lastName: 'Flintstone'
 });
 
-assert.equal(dataFlow.get('fullName'), 'Fred Flintstone');
+assert.equal(state.get('fullName'), 'Fred Flintstone');
 ```
 
 Now if either firstName or `lastName` changes, `fullName` will be updated (synchronously).
 
 ```js
-dataFlow.set({ firstName: 'Wilma' });
-assert.equal(dataFlow.get('fullName'), 'Wilma Flintstone');
+state.set({ firstName: 'Wilma' });
+assert.equal(state.get('fullName'), 'Wilma Flintstone');
 ```
 
 <p align="center">
@@ -135,7 +136,7 @@ assert.equal(dataFlow.get('fullName'), 'Wilma Flintstone');
 You can use reactive functions to trigger code with side effects, like DOM manipulation:
 
 ```js
-const dataFlow = DataFlowGraph({
+const state = Topologica({
   fullName: λ(
     ({firstName, lastName}) => `${firstName} ${lastName}`,
     'firstName, lastName'
@@ -157,19 +158,19 @@ Here's the tricky case, where breadth-first propagation fails but topological so
 </p>
 
 ```js
-const dataFlow = DataFlowGraph({
+const state = Topologica({
   b: λ(({a}) => a + 1, 'a'),
   c: λ(({b}) => b + 1, 'b'),
   d: λ(({a}) => a + 1, 'a'),
   e: λ(({b, d}) => b + d, 'b, d')
 });
-dataFlow.set({ a: 5 });
+state.set({ a: 5 });
 const a = 5;
 const b = a + 1;
 const c = b + 1;
 const d = a + 1;
 const e = b + d;
-assert.equal(dataFlow.get('e'), e);
+assert.equal(state.get('e'), e);
 ```
 
 For more complex cases, have a look at the [tests](/test/test.js).
