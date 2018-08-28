@@ -8,12 +8,14 @@ const Topologica = options => {
   const functions = new Map();
   const graph = Graph();
 
+  const invoke = property => {
+    functions.get(property)();
+  };
+
   const digest = () => {
     graph
       .topologicalSort(Array.from(changed.values()))
-      .forEach(property => {
-        functions.get(property)();
-      });
+      .forEach(invoke);
     changed.clear();
   };
 

@@ -270,13 +270,17 @@ describe('Topologica.js', () => {
       g: λ(({a}) => a + 1, 'a'),
       h: λ(({d, f, g}) => d + f + g, 'd, f, g')
     });
-    const begin = Date.now();
-    for(let i = 0; i < 200000; i++){
-      state.set({ a: i });
+    const numRuns = 2;
+    //const numRuns = 20;
+    for(let j = 0; j < numRuns; j++){
+      const begin = Date.now();
+      for(let i = 0; i < 200000; i++){
+        state.set({ a: i });
+      }
+      const end = Date.now();
+      const time = end - begin;
+      console.log(time); // 487
     }
-    const end = Date.now();
-    const time = end - begin;
-    console.log(time); // 500
-    assert(time < 1000);
+    //assert(time < 1000);
   });
 });
