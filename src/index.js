@@ -16,8 +16,10 @@ const Topologica = options => {
   };
 
   const setProperty = ([property, value]) => {
-    values.set(property, value);
-    changed.add(property);
+    if (values.get(property) !== value) {
+      values.set(property, value);
+      changed.add(property);
+    }
   };
 
   const set = options => {
