@@ -1,5 +1,5 @@
 import pkg from './package.json';
-import babel from 'rollup-plugin-babel';
+import buble from 'rollup-plugin-buble';
 
 export default {
   input: 'src/index.js',
@@ -9,8 +9,6 @@ export default {
     file: pkg.main
   },
   plugins: [
-    babel({
-      exclude: ['node_modules/**']
-    })
+    buble()
   ]
 }
