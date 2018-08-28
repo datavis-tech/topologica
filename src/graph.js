@@ -26,13 +26,11 @@ export default () => {
       }
     };
 
-    sourceNodes.forEach(node => {
-      visited.add(node);
-    });
+    sourceNodes.forEach(visited.add, visited);
 
-    sourceNodes.forEach(node => {
-      adjacent(node).forEach(DFSVisit);
-    });
+    sourceNodes.forEach(node => 
+      adjacent(node).forEach(DFSVisit)
+    );
 
     return nodeList;
   }

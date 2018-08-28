@@ -1,7 +1,16 @@
 const Topologica = require('..');
 const assert = require('assert');
 
-const { DataFlowGraph, ReactiveFunction: λ } = Topologica;
+const { DataFlowGraph } = Topologica;
+
+const parse = dependenciesStr => dependenciesStr
+  .split(',')
+  .map(input => input.trim());
+
+const λ = (fn, dependenciesStr) => {
+  fn.dependencies = parse(dependenciesStr);
+  return fn;
+};
 
 describe('Topologica.js', () => {
 
