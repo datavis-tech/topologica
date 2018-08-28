@@ -6,8 +6,7 @@ const Topologica = options => {
   const values = new Map();
   const functions = new Map();
   const graph = Graph();
-
-  let changed = new Set();
+  const changed = new Set();
 
   const invoke = property => {
     functions.get(property)();
@@ -17,7 +16,7 @@ const Topologica = options => {
     graph
       .topologicalSort(Array.from(changed.values()))
       .forEach(invoke);
-    changed = new Set();
+    changed.clear();
   };
 
   const set = options => {
