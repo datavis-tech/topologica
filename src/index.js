@@ -17,15 +17,14 @@ const Topologica = options => {
     changed.clear();
   };
 
-  const setProperty = ([property, value]) => {
-    if (values.get(property) !== value) {
-      values.set(property, value);
-      changed.add(property);
-    }
-  };
-
   const set = options => {
-    Object.entries(options).forEach(setProperty);
+    Object.keys(options).forEach(property => {
+      const value = options[property];
+      if (values.get(property) !== value) {
+        values.set(property, value);
+        changed.add(property);
+      }
+    });
     digest();
   };
 
@@ -41,8 +40,9 @@ const Topologica = options => {
     .every(values.has, values);
 
   if (options) {
-    Object.entries(options).forEach(([ property, fn ]) => {
-      const { dependencies } = fn;
+    Object.keys(options).forEach(property => {
+      const fn = options[property];
+      const dependencies = fn.dependencies;
 
       const propertySync = isAsync(fn) ? property + "'" : property;
 
