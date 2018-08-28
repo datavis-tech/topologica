@@ -1,6 +1,5 @@
 export default () => {
   const edges = {};
-  const visited = new Set();
 
   const adjacent = node => edges[node] || [];
 
@@ -15,19 +14,23 @@ export default () => {
   };
 
   const depthFirstSearch = sourceNodes => {
-    visited.clear();
+    const visited = new Set();
     const nodeList = [];
-    const DFSVisit = node => {
+
+    function DFSVisit(node) {
       if (!visited.has(node)) {
-        visited.add(node);
-        adjacent(node).forEach(DFSVisit);
+        visit(node);
         nodeList.push(node);
       }
     };
-    sourceNodes.forEach(visited.add, visited);
-    sourceNodes.forEach(node => {
-      adjacent(node).forEach(DFSVisit)
-    });
+
+    function visit(node) {
+      visited.add(node);
+      adjacent(node).forEach(DFSVisit);
+    }
+
+    sourceNodes.forEach(visit);
+
     return nodeList;
   }
 

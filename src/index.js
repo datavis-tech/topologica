@@ -1,6 +1,6 @@
 import Graph from './graph'
 
-const isAsync = fn => fn && fn.constructor.name === 'AsyncFunction';
+const isAsync = fn => fn.constructor.name === 'AsyncFunction';
 
 const Topologica = options => {
   const values = new Map();
@@ -11,33 +11,38 @@ const Topologica = options => {
   const digest = () => {
     graph
       .topologicalSort(Array.from(changed.values()))
-      .forEach(property => functions.get(property)());
+      .forEach(property => {
+        functions.get(property)();
+      });
     changed.clear();
   };
 
-  const setProperty = ([property, value]) => {
-    if (values.get(property) !== value) {
-      values.set(property, value);
-      changed.add(property);
-    }
-  };
-
   const set = options => {
-    Object.entries(options).forEach(setProperty);
+    Object.keys(options).forEach(property => {
+      const value = options[property];
+      if (values.get(property) !== value) {
+        values.set(property, value);
+        changed.add(property);
+      }
+    });
     digest();
   };
 
-  const get = property => values.get(property);
+  const get = values.get.bind(values);
 
-  const getAll = properties => properties
-    .reduce((obj, property) => (obj[property] = get(property), obj), {});
+  const getAll = properties =>
+    properties.reduce((accumulator, property) => {
+      accumulator[property] = get(property);
+      return accumulator;
+    }, {});
 
   const allDefined = properties => properties
-    .every(property => values.has(property))
+    .every(values.has, values);
 
   if (options) {
-    Object.entries(options).forEach(([ property, fn ]) => {
-      const { dependencies } = fn;
+    Object.keys(options).forEach(property => {
+      const fn = options[property];
+      const dependencies = fn.dependencies;
 
       const propertySync = isAsync(fn) ? property + "'" : property;
 
@@ -49,7 +54,11 @@ const Topologica = options => {
         if (allDefined(dependencies)) {
           const output = fn(getAll(dependencies));
           isAsync(fn)
-            ? output.then(value => set({[property]: value}))
+            ? output.then(value => {
+              set({
+                [property]: value
+              });
+            })
             : values.set(property, output);
         }
       });

@@ -1,16 +1,13 @@
-import pkg from './package.json';
-import babel from 'rollup-plugin-babel';
+import buble from 'rollup-plugin-buble';
 
 export default {
   input: 'src/index.js',
   output: {
     format: 'umd',
     name: 'Topologica',
-    file: pkg.main
+    file: 'dist/topologica.js'
   },
   plugins: [
-    babel({
-      exclude: ['node_modules/**']
-    })
+    buble()
   ]
 }
