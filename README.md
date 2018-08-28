@@ -1,5 +1,5 @@
 # Topologica.js
-A minimal library for [reactive](https://en.wikipedia.org/wiki/Reactive_programming) [dataflow programming](https://en.wikipedia.org/wiki/Dataflow_programming). Weighs [1.3KB minified](https://unpkg.com/topologica).
+A minimal library for [reactive](https://en.wikipedia.org/wiki/Reactive_programming) [dataflow programming](https://en.wikipedia.org/wiki/Dataflow_programming). Weighs [1.2KB minified](https://unpkg.com/topologica).
 
 This library provides an abstraction for **reactive data flows**. This means you can define functions in terms of their inputs (dependencies) and outputs, and the library will take care of executing _only_ the required functions to propagate changes through the data flow graph, in the correct order. The ordering of change propagation through the data flow graph is determined using the [topological sorting algorithm](https://en.wikipedia.org/wiki/Topological_sorting) (hence the name _Topologica_).  
 
