@@ -195,3 +195,4 @@ Similar initiatives:
  * [Vega Dataflow](https://github.com/vega/vega-dataflow)
  * [Crosslink.js](https://github.com/monfera/crosslink)
  * [Flyd](https://github.com/paldepind/flyd)
+ * [Javelin](https://github.com/hoplon/javelin)
