@@ -24,17 +24,16 @@ npm install --save-dev topologica
 Then import it into your code like this:
 
 ```js
-import { DataFlowGraph, ReactiveFunction as λ } from 'topologica';
+import Topologica from 'topologica';
 ```
 
 You can also include the library in a script tag from Unpkg, like this:
 
 ```html
-<script src="https://unpkg.com/topologica@1.1.0/dist/topologica.min.js"></script>
-<script>
-  const { DataFlowGraph, ReactiveFunction: λ } = Topologica;
-</script>
+<script src="https://unpkg.com/topologica@2.0.0/dist/topologica.min.js"></script>
 ```
+
+This introduces the global `Topologica`.
 
 ## Examples
 
@@ -42,17 +41,23 @@ You can also include the library in a script tag from Unpkg, like this:
 
 ## Usage
 
-You can define _reactive functions_ that compute properties that depend on other properties as input. For example, consider the following example where `b` gets set to `a + 1` whenever `a` changes.
+You can define _reactive functions_ that compute properties that depend on other properties as input. These properties exist on objects that are instances of `Topologica`, so in a sense they are namespaced rather than free-floating. For example, consider the following example where `b` gets set to `a + 1` whenever `a` changes.
 
 ```javascript
-const dataFlow = DataFlowGraph({
-  b: λ(
-    ({a}) => a + 1,
-    'a'
-  )
-});
-dataFlow.set({ a: 2 });
-assert.equal(dataFlow.get('b'), 3);
+// First, define a function that accepts an options object as an argument.
+const b = ({a}) => a + 1;
+
+// Next, declare the dependencies of this function as an array of names.
+b.dependencies = ['a'];
+
+// Pass this function into the Topologica constructor.
+const state = Topologica({ b });
+
+// Setting the value of a will synchronously propagate changes to B.
+state.set({ a: 2 });
+
+// You can use state.get to retreive computed values.
+assert.equal(state.get('b'), 3);
 ```
 
 <p align="center">
@@ -64,12 +69,16 @@ assert.equal(dataFlow.get('b'), 3);
 Here's an example that assigns `b = a + 1` and `c = b + 1`.
 
 ```javascript
-const dataFlow = DataFlowGraph({
-  b: λ(({a}) => a + 1, 'a'),
-  c: λ(({b}) => b + 1, 'b')
-});
-dataFlow.set({ a: 5 });
-assert.equal(dataFlow.get('c'), 7);
+const b = ({a}) => a + 1
+b.dependencies = ['a'];
+
+const c = ({b}) => b + 1;
+c.dependencies = ['b'];
+
+const state = Topologica({ b, c });
+
+state.set({ a: 5 });
+assert.equal(state.get('c'), 7);
 ```
 
 <p align="center">
@@ -78,10 +87,39 @@ assert.equal(dataFlow.get('c'), 7);
   Here, b is both an output and an input.
 </p>
 
+For the rest of the examples here, we'll make use of the following convenience function for constructing reactive functions using a single statement:
+
+```js
+const λ = (fn, dependenciesCommaSeparated) => {
+  fn.dependencies = dependenciesCommaSeparated
+    .split(',')
+    .map(str => str.trim());
+  return fn;
+};
+```
+
+While this convenience function is useful for the examples here in this README, it is not part of the library itself. This is to keep the library minimal. If you think this function should be part of the library, please open a new issue.
+
+Here's the previous example re-written to use this convenience function.
+
+```js
+
+const state = Topologica({
+  b: λ(({a}) => a + 1, 'a'),
+  c: λ(({b}) => b + 1, 'b')
+});
+
+state.set({ a: 5 });
+assert.equal(state.get('c'), 7);
+```
+
+## Asynchronous Functions
+
 Here's an example that uses an asynchronous function.
 
 ```javascript
-const dataFlow = DataFlowGraph({
+
+const state = Topologica({
   b: λ(
     async ({a}) => await Promise.resolve(a + 5),
     'a'
@@ -91,7 +129,7 @@ const dataFlow = DataFlowGraph({
     'b'
   )
 });
-dataFlow.set({ a: 5 });
+state.set({ a: 5 });
 ```
 
 <p align="center">
@@ -100,42 +138,45 @@ dataFlow.set({ a: 5 });
   Asynchronous functions cut the dependency graph.
 </p>
 
+## Complex Dependency Graphs
+
+The dependency graphs within an instance of Topologa can be arbitrarily complex [directed acyclic graphs](https://en.wikipedia.org/wiki/Directed_acyclic_graph). This section shows some examples building in complexity.
+
 Here's an example that computes a person's full name from their first name and and last name.
 
 ```js
-const { DataFlowGraph, ReactiveFunction: λ } = Topologica;
-const dataFlow = DataFlowGraph({
+const state = Topologica({
   fullName: λ(
     ({firstName, lastName}) => `${firstName} ${lastName}`,
     'firstName, lastName'
   )
 });
 
-dataFlow.set({
+state.set({
   firstName: 'Fred',
   lastName: 'Flintstone'
 });
 
-assert.equal(dataFlow.get('fullName'), 'Fred Flintstone');
+assert.equal(state.get('fullName'), 'Fred Flintstone');
 ```
 
 Now if either firstName or `lastName` changes, `fullName` will be updated (synchronously).
 
 ```js
-dataFlow.set({ firstName: 'Wilma' });
-assert.equal(dataFlow.get('fullName'), 'Wilma Flintstone');
+state.set({ firstName: 'Wilma' });
+assert.equal(state.get('fullName'), 'Wilma Flintstone');
 ```
 
 <p align="center">
   <img src="https://cloud.githubusercontent.com/assets/68416/15389922/cf3f24dc-1dd6-11e6-92d6-058051b752ea.png">
   <br>
-  The data flow graph for the example code above.
+  Full name changes whenever its dependencies change.
 </p>
 
-You can use reactive functions to trigger code with side effects, like DOM manipulation:
+You can use reactive functions to trigger code with side effects like DOM manipulation.
 
 ```js
-const dataFlow = DataFlowGraph({
+const state = Topologica({
   fullName: λ(
     ({firstName, lastName}) => `${firstName} ${lastName}`,
     'firstName, lastName'
@@ -148,35 +189,33 @@ const dataFlow = DataFlowGraph({
 assert.equal(d3.select('#full-name').text(), 'Fred Flintstone');
 ```
 
-Data flow graphs can be arbitrarily complex [directed acyclic graphs](https://en.wikipedia.org/wiki/Directed_acyclic_graph).
-
-Here's the tricky case, where breadth-first propagation fails but topological sorting succeeds.
+Here's the tricky case, where breadth-first or time-tick-based propagation fails (e.g. `when` in RxJS) but topological sorting succeeds.
 
 <p align="center">
   <img src="https://cloud.githubusercontent.com/assets/68416/15400254/7f779c9a-1e08-11e6-8992-9d2362bfba63.png">
 </p>
 
 ```js
-const dataFlow = DataFlowGraph({
+const state = Topologica({
   b: λ(({a}) => a + 1, 'a'),
   c: λ(({b}) => b + 1, 'b'),
   d: λ(({a}) => a + 1, 'a'),
   e: λ(({b, d}) => b + d, 'b, d')
 });
-dataFlow.set({ a: 5 });
+state.set({ a: 5 });
 const a = 5;
 const b = a + 1;
 const c = b + 1;
 const d = a + 1;
 const e = b + d;
-assert.equal(dataFlow.get('e'), e);
+assert.equal(state.get('e'), e);
 ```
 
-For more complex cases, have a look at the [tests](/test/test.js).
+For more examples, have a look at the [tests](/test/test.js).
 
 ## Contributing
 
-If you have any ideas concerning developer ergonomics, syntactic sugar, or new features, please [open an issue](https://github.com/datavis-tech/topologica/issues).
+Feel free to [open an issue](https://github.com/datavis-tech/topologica/issues). Pull requests for open issues are welcome.
 
 ## Related Work
 
@@ -198,3 +237,5 @@ Similar initiatives:
  * [Crosslink.js](https://github.com/monfera/crosslink)
  * [Flyd](https://github.com/paldepind/flyd)
  * [Javelin](https://github.com/hoplon/javelin)
+
+See also this excellent article [State management in JavaScript by David Meister](https://codeburst.io/state-management-in-javascript-15d0d98837e1).
