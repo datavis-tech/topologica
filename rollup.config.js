@@ -1,4 +1,3 @@
-import pkg from './package.json';
 import buble from 'rollup-plugin-buble';
 
 export default {
@@ -6,7 +5,7 @@ export default {
   output: {
     format: 'umd',
     name: 'Topologica',
-    file: pkg.main
+    file: 'dist/topologica.js'
   },
   plugins: [
     buble()

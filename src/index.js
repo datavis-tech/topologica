@@ -33,7 +33,7 @@ const Topologica = options => {
     .reduce((obj, property) => (obj[property] = get(property), obj), {});
 
   const allDefined = properties => properties
-    .every(property => values.has(property))
+    .every(values.has, values);
 
   if (options) {
     Object.entries(options).forEach(([ property, fn ]) => {

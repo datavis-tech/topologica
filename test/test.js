@@ -1,4 +1,4 @@
-const Topologica = require('..');
+const Topologica = require('../dist/topologica.js');
 const assert = require('assert');
 
 const parse = dependenciesStr => dependenciesStr
