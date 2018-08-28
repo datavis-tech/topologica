@@ -1,117 +1,135 @@
 const Topologica = require('..');
 const assert = require('assert');
 
-const { DataFlowGraph, ReactiveFunction: λ } = Topologica;
+const parse = dependenciesStr => dependenciesStr
+  .split(',')
+  .map(input => input.trim());
+
+const λ = (fn, dependenciesStr) => {
+  fn.dependencies = parse(dependenciesStr);
+  return fn;
+};
 
 describe('Topologica.js', () => {
 
   it('Should set and get a value.', () => {
-    const dataFlow = DataFlowGraph();
-    dataFlow.set({
+    const state = Topologica();
+    state.set({
       foo: 'bar'
     });
-    assert.equal(dataFlow.get('foo'), 'bar');
+    assert.equal(state.get('foo'), 'bar');
   });
 
   it('Should compute a derived property.', () => {
-    const dataFlow = DataFlowGraph({
+    const state = Topologica({
       b: λ(({a}) => a + 1, 'a')
     });
-    dataFlow.set({
+    state.set({
       a: 5
     });
-    assert.equal(dataFlow.get('b'), 6);
+    assert.equal(state.get('b'), 6);
   });
 
   it('Should handle uninitialized property.', () => {
-    const dataFlow = DataFlowGraph({
+    const state = Topologica({
       b: λ(({a}) => a + 1, 'a')
     });
-    assert.equal(dataFlow.get('b'), undefined);
+    assert.equal(state.get('b'), undefined);
   });
 
   it('Should propagate changes synchronously.', () => {
-    const dataFlow = DataFlowGraph({
+    const state = Topologica({
       b: λ(({a}) => a + 1, 'a')
     });
 
-    dataFlow.set({
+    state.set({
       a: 2
     });
-    assert.equal(dataFlow.get('b'), 3);
+    assert.equal(state.get('b'), 3);
 
-    dataFlow.set({
+    state.set({
       a: 99
     });
-    assert.equal(dataFlow.get('b'), 100);
+    assert.equal(state.get('b'), 100);
   });
 
   it('Should compute a derived property with 2 hops.', () => {
-    const dataFlow = DataFlowGraph({
+    const state = Topologica({
       b: λ(({a}) => a + 1, 'a'),
       c: λ(({b}) => b + 1, 'b')
     });
-    dataFlow.set({
+    state.set({
       a: 5
     });
-    assert.equal(dataFlow.get('c'), 7);
+    assert.equal(state.get('c'), 7);
   });
 
   it('Should handle case of 2 inputs.', () => {
-    const dataFlow = DataFlowGraph({
+    const state = Topologica({
       fullName: λ(
         ({firstName, lastName}) => `${firstName} ${lastName}`,
         'firstName, lastName'
       )
     });
-    dataFlow.set({
+    state.set({
       firstName: 'Fred',
       lastName: 'Flintstone'
     });
-    assert.equal(dataFlow.get('fullName'), 'Fred Flintstone');
+    assert.equal(state.get('fullName'), 'Fred Flintstone');
+  });
+
+  it('Should accept an array of strings as dependencies.', () => {
+    const fullName = ({firstName, lastName}) => `${firstName} ${lastName}`;
+    fullName.dependencies = ['firstName', 'lastName'];
+    const state = Topologica({ fullName });
+    state.set({
+      firstName: 'Fred',
+      lastName: 'Flintstone'
+    });
+    assert.equal(state.get('fullName'), 'Fred Flintstone');
   });
 
   it('Should only execute when all inputs are defined.', () => {
-    const dataFlow = DataFlowGraph({
+    const state = Topologica({
       fullName: λ(
         ({firstName, lastName}) => `${firstName} ${lastName}`,
         'firstName, lastName'
       )
     });
 
-    dataFlow.set({
+    state.set({
       lastName: 'Flintstone'
     });
-    assert.equal(dataFlow.get('fullName'), undefined);
+    assert.equal(state.get('fullName'), undefined);
 
-    dataFlow.set({
+    state.set({
       firstName: 'Wilma'
     });
-    assert.equal(dataFlow.get('fullName'), 'Wilma Flintstone');
+    assert.equal(state.get('fullName'), 'Wilma Flintstone');
   });
 
   it('Should handle case of 3 inputs.', () => {
-    const dataFlow = DataFlowGraph({
+    const state = Topologica({
       d: λ(({a, b, c}) => a + b + c, 'a,b,c')
     });
-    dataFlow.set({
+    state.set({
       a: 5,
       b: 8,
       c: 2
     });
-    assert.equal(dataFlow.get('d'), 15);
+    assert.equal(state.get('d'), 15);
   });
 
   it('Should handle spaces in input string.', () => {
-    const dataFlow = DataFlowGraph({
+    const state = Topologica({
       d: λ(({a, b, c}) => a + b + c, '  a ,    b, c   ')
     });
-    dataFlow.set({
+    state.set({
       a: 5,
       b: 8,
       c: 2
     });
-    assert.equal(dataFlow.get('d'), 15);
+    assert.equal(state.get('d'), 15);
   });
 
   // Data flow graph, read from top to bottom.
@@ -123,16 +141,16 @@ describe('Topologica.js', () => {
   //    e   
   //
   it('Should evaluate not-too-tricky case.', () => {
-    const dataFlow = DataFlowGraph({
+    const state = Topologica({
       b: λ(({a}) => a + 1, 'a'),
       d: λ(({c}) => c + 1, 'c'),
       e: λ(({b, d}) => b + d, 'b, d')
     });
-    dataFlow.set({
+    state.set({
       a: 1,
       c: 2
     });
-    assert.equal(dataFlow.get('e'), (1 + 1) + (2 + 1));
+    assert.equal(state.get('e'), (1 + 1) + (2 + 1));
   });
 
   //      a
@@ -143,21 +161,21 @@ describe('Topologica.js', () => {
   //     \ /
   //      e   
   it('Should evaluate tricky case.', () => {
-    const dataFlow = DataFlowGraph({
+    const state = Topologica({
       b: λ(({a}) => a + 1, 'a'),
       c: λ(({b}) => b + 1, 'b'),
       d: λ(({a}) => a + 1, 'a'),
       e: λ(({b, d}) => b + d, 'b, d')
     });
-    dataFlow.set({
+    state.set({
       a: 5
     });
-    const a = dataFlow.get('a');
+    const a = state.get('a');
     const b = a + 1;
     const c = b + 1;
     const d = a + 1;
     const e = b + d;
-    assert.equal(dataFlow.get('e'), e);
+    assert.equal(state.get('e'), e);
   });
 
 
@@ -171,7 +189,7 @@ describe('Topologica.js', () => {
   //     \ / /
   //       h   
   it('Should evaluate trickier case.', () => {
-    const dataFlow = DataFlowGraph({
+    const state = Topologica({
       b: λ(({a}) => a + 1, 'a'),
       c: λ(({b}) => b + 1, 'b'),
       d: λ(({c}) => c + 1, 'c'),
@@ -180,10 +198,10 @@ describe('Topologica.js', () => {
       g: λ(({a}) => a + 1, 'a'),
       h: λ(({d, f, g}) => d + f + g, 'd, f, g')
     });
-    dataFlow.set({
+    state.set({
       a: 5
     });
-    const a = dataFlow.get('a');
+    const a = state.get('a');
     const b = a + 1;
     const c = b + 1;
     const d = c + 1;
@@ -191,21 +209,21 @@ describe('Topologica.js', () => {
     const f = e + 1;
     const g = a + 1;
     const h = d + f + g;
-    assert.equal(dataFlow.get('h'), h);
+    assert.equal(state.get('h'), h);
   });
 
   it('Should work with booleans.', () => {
-    const dataFlow = DataFlowGraph({
+    const state = Topologica({
       b: λ(({a}) => !a, 'a')
     });
-    dataFlow.set({
+    state.set({
       a: false
     });
-    assert.equal(dataFlow.get('b'), true);
+    assert.equal(state.get('b'), true);
   });
 
   it('Should work with async functions.', done => {
-    const dataFlow = DataFlowGraph({
+    const state = Topologica({
       b: λ(
         async ({a}) => await Promise.resolve(a + 5),
         'a'
@@ -218,7 +236,7 @@ describe('Topologica.js', () => {
         'b'
       )
     });
-    dataFlow.set({
+    state.set({
       a: 5
     });
   });

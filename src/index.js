@@ -2,7 +2,7 @@ import Graph from './graph'
 
 const isAsync = fn => fn && fn.constructor.name === 'AsyncFunction';
 
-export const DataFlowGraph = options => {
+const Topologica = options => {
   const values = new Map();
   const changed = new Set();
   const functions = new Map();
@@ -34,18 +34,18 @@ export const DataFlowGraph = options => {
     .every(property => values.has(property))
 
   if (options) {
-    Object.entries(options).forEach(entry => {
-      const [ property, { fn, inputs } ] = entry;
+    Object.entries(options).forEach(([ property, fn ]) => {
+      const { dependencies } = fn;
 
       const propertySync = isAsync(fn) ? property + "'" : property;
 
-      inputs.forEach(input => {
+      dependencies.forEach(input => {
         graph.addEdge(input, propertySync);
       });
 
       functions.set(propertySync, () => {
-        if (allDefined(inputs)) {
-          const output = fn(getAll(inputs));
+        if (allDefined(dependencies)) {
+          const output = fn(getAll(dependencies));
           isAsync(fn)
             ? output.then(value => set({[property]: value}))
             : values.set(property, output);
@@ -56,3 +56,5 @@ export const DataFlowGraph = options => {
 
   return { set, get };
 };
+
+export default Topologica;
