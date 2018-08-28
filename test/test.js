@@ -1,4 +1,4 @@
-const Topologica = require('..');
+const Topologica = require('../dist/topologica.js');
 const assert = require('assert');
 
 const parse = dependenciesStr => dependenciesStr
@@ -239,5 +239,24 @@ describe('Topologica.js', () => {
     state.set({
       a: 5
     });
+  });
+
+  it('Should only propagate changes when values change.', () => {
+    let invocations = 0;
+
+    const state = Topologica({
+      b: λ(({a}) => invocations++, 'a')
+    });
+
+    assert.equal(invocations, 0);
+
+    state.set({ a: 2 });
+    assert.equal(invocations, 1);
+
+    state.set({ a: 2 });
+    assert.equal(invocations, 1);
+
+    state.set({ a: 99 });
+    assert.equal(invocations, 2);
   });
 });
