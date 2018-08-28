@@ -270,8 +270,8 @@ describe('Topologica.js', () => {
       g: λ(({a}) => a + 1, 'a'),
       h: λ(({d, f, g}) => d + f + g, 'd, f, g')
     });
-    const numRuns = 2;
-    //const numRuns = 20;
+    const numRuns = 10;
+    let totalTime = 0;
     for(let j = 0; j < numRuns; j++){
       const begin = Date.now();
       for(let i = 0; i < 200000; i++){
@@ -279,8 +279,10 @@ describe('Topologica.js', () => {
       }
       const end = Date.now();
       const time = end - begin;
-      console.log(time); // 487
+      totalTime += time;
+      console.log(time);
     }
-    //assert(time < 1000);
-  });
+    console.log('Average: ' + (totalTime / numRuns));
+    // 468.9
+  }).timeout(7000);
 });
