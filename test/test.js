@@ -222,8 +222,10 @@ describe('Topologica.js', () => {
 
   it('Should work with async functions.', done => {
     const state = Topologica({
-      b: λ(
-        async ({a}) => await Promise.resolve(a + 5),
+      "b'": λ(
+        async ({a}) => state.set({
+          b: await Promise.resolve(a + 5)
+        }),
         'a'
       ),
       c: λ(

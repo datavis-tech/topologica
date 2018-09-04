@@ -1,7 +1,5 @@
 import Graph from './graph'
 
-const isAsync = fn => fn.constructor.name === 'AsyncFunction';
-
 const Topologica = options => {
   const values = new Map();
   const functions = new Map();
@@ -46,22 +44,13 @@ const Topologica = options => {
       const fn = options[property];
       const dependencies = fn.dependencies;
 
-      const propertySync = isAsync(fn) ? property + "'" : property;
-
       dependencies.forEach(input => {
-        graph.addEdge(input, propertySync);
+        graph.addEdge(input, property);
       });
 
-      functions.set(propertySync, () => {
+      functions.set(property, () => {
         if (allDefined(dependencies)) {
-          const output = fn(getAll(dependencies));
-          isAsync(fn)
-            ? output.then(value => {
-              set({
-                [property]: value
-              });
-            })
-            : values.set(property, output);
+          values.set(property, fn(getAll(dependencies)));
         }
       });
     });

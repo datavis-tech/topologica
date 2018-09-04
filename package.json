@@ -5,9 +5,9 @@
   "main": "dist/topologica.min.js",
   "scripts": {
     "build": "rollup -c",
-    "pretest": "npm run build",
+    "pretest": "npm run build && uglifyjs dist/topologica.js -c -m -o dist/topologica.min.js && ls -la dist/topologica.min.js",
     "test": "mocha",
-    "prepublishOnly": "npm run test && uglifyjs dist/topologica.js -c -m -o dist/topologica.min.js",
+    "prepublishOnly": "npm run test",
     "postpublish": "git push && git push --tags"
   },
   "repository": {
