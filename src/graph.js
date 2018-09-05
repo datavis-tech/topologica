@@ -14,18 +14,18 @@ export default () => {
   };
 
   const depthFirstSearch = sourceNodes => {
-    const visited = new Set();
+    const visited = {};
     const nodeList = [];
 
     function DFSVisit(node) {
-      if (!visited.has(node)) {
+      if (!visited[node]) {
         visit(node);
         nodeList.push(node);
       }
     };
 
     function visit(node) {
-      visited.add(node);
+      visited[node] = true;
       adjacent(node).forEach(DFSVisit);
     }
 
