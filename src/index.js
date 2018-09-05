@@ -16,9 +16,8 @@ const Topologica = options => {
   const set = options => {
     const changed = [];
     Object.keys(options).forEach(property => {
-      const value = options[property];
-      if (values[property] !== value) {
-        values[property] = value;
+      if (values[property] !== options[property]) {
+        values[property] = options[property];
         changed.push(property);
       }
     });
