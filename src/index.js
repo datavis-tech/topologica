@@ -2,6 +2,10 @@ import Graph from './graph'
 
 const isAsync = fn => fn.constructor.name === 'AsyncFunction';
 
+const parse = dependencies => dependencies.split
+  ? dependencies.split(',').map(str => str.trim())
+  : dependencies;
+
 const Topologica = options => {
   const values = new Map();
   const functions = new Map();
@@ -44,7 +48,7 @@ const Topologica = options => {
   if (options) {
     Object.keys(options).forEach(property => {
       const fn = options[property];
-      const dependencies = fn.dependencies;
+      const dependencies = parse(fn.dependencies)
 
       const propertySync = isAsync(fn) ? property + "'" : property;
 
