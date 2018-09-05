@@ -7,8 +7,8 @@ const parse = dependencies => dependencies.split
 const Topologica = options => {
   const values = {};
   const functions = {};
+  let changed = {};
   const graph = Graph();
-  const changed = new Set();
 
   const invoke = property => {
     functions[property]();
@@ -16,9 +16,9 @@ const Topologica = options => {
 
   const digest = () => {
     graph
-      .topologicalSort(Array.from(changed.values()))
+      .topologicalSort(Object.keys(changed))
       .forEach(invoke);
-    changed.clear();
+    changed = {};
   };
 
   const set = options => {
@@ -26,7 +26,7 @@ const Topologica = options => {
       const value = options[property];
       if (values[property] !== value) {
         values[property] = value;
-        changed.add(property);
+        changed[property] = true;
       }
     });
     digest();
