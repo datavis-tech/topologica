@@ -87,32 +87,6 @@ assert.equal(state.get('c'), 7);
   Here, b is both an output and an input.
 </p>
 
-For the rest of the examples here, we'll make use of the following convenience function for constructing reactive functions using a single statement:
-
-```js
-const λ = (fn, dependenciesCommaSeparated) => {
-  fn.dependencies = dependenciesCommaSeparated
-    .split(',')
-    .map(str => str.trim());
-  return fn;
-};
-```
-
-While this convenience function is useful for the examples here in this README, it is not part of the library itself. This is to keep the library minimal. If you think this function should be part of the library, please open a new issue.
-
-Here's the previous example re-written to use this convenience function.
-
-```js
-
-const state = Topologica({
-  b: λ(({a}) => a + 1, 'a'),
-  c: λ(({b}) => b + 1, 'b')
-});
-
-state.set({ a: 5 });
-assert.equal(state.get('c'), 7);
-```
-
 ## Asynchronous Functions
 
 Here's an example that uses an asynchronous function.
@@ -145,18 +119,12 @@ The dependency graphs within an instance of Topologa can be arbitrarily complex 
 Here's an example that computes a person's full name from their first name and and last name.
 
 ```js
-const state = Topologica({
-  fullName: λ(
-    ({firstName, lastName}) => `${firstName} ${lastName}`,
-    'firstName, lastName'
-  )
-});
+const fullName = ({firstName, lastName}) => `${firstName} ${lastName}`;
+fullName.dependencies = 'firstName, lastName';
 
-state.set({
-  firstName: 'Fred',
-  lastName: 'Flintstone'
-});
+const state = Topologica({ fullName });
 
+state.set({ firstName: 'Fred', lastName: 'Flintstone' });
 assert.equal(state.get('fullName'), 'Fred Flintstone');
 ```
 
@@ -172,6 +140,33 @@ assert.equal(state.get('fullName'), 'Wilma Flintstone');
   <br>
   Full name changes whenever its dependencies change.
 </p>
+
+Note that `dependencies` can be passed in as either:
+
+ * an array of strings (e.g. `['firstName', 'lastName']`), or
+ * a comma delimited string (e.g. `firstName, lastName`).
+
+For the rest of the examples here, we'll make use of the following convenience function for constructing reactive functions using a single statement:
+
+```js
+const λ = (fn, dependencies) => {
+  fn.dependencies = dependencies;
+  return fn;
+};
+```
+
+While this convenience function is useful for the examples here in this README, it is not part of the library itself. This is to keep the library minimal. If you think this function should be part of the library, please open a new issue.
+
+Here's the previous example re-written to use this convenience function.
+
+```js
+const state = Topologica({
+  fullName: λ(
+    ({firstName, lastName}) => `${firstName} ${lastName}`,
+    'firstName, lastName'
+  )
+});
+```
 
 You can use reactive functions to trigger code with side effects like DOM manipulation.
 

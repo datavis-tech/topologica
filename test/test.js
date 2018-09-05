@@ -1,10 +1,8 @@
 const Topologica = require('../dist/topologica.js');
 const assert = require('assert');
 
-const λ = (fn, dependenciesCommaSeparated) => {
-  fn.dependencies = dependenciesCommaSeparated
-    .split(',')
-    .map(str => str.trim());
+const λ = (fn, dependencies) => {
+  fn.dependencies = dependencies;
   return fn;
 };
 
