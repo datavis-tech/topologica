@@ -6,12 +6,12 @@ const parse = dependencies => dependencies.split
 
 const Topologica = options => {
   const values = {};
-  const functions = new Map();
+  const functions = {};
   const graph = Graph();
   const changed = new Set();
 
   const invoke = property => {
-    functions.get(property)();
+    functions[property]();
   };
 
   const digest = () => {
@@ -46,11 +46,11 @@ const Topologica = options => {
         graph.addEdge(input, property);
       });
 
-      functions.set(property, () => {
+      functions[property] = () => {
         if (allDefined(dependencies)) {
           values[property] = fn(values);
         }
-      });
+      };
     });
   }
 
