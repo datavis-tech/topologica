@@ -5,7 +5,7 @@ const parse = dependencies => dependencies.split
   : dependencies;
 
 const Topologica = options => {
-  const values = new Map();
+  const values = {};
   const functions = new Map();
   const graph = Graph();
   const changed = new Set();
@@ -24,24 +24,18 @@ const Topologica = options => {
   const set = options => {
     Object.keys(options).forEach(property => {
       const value = options[property];
-      if (values.get(property) !== value) {
-        values.set(property, value);
+      if (values[property] !== value) {
+        values[property] = value;
         changed.add(property);
       }
     });
     digest();
   };
 
-  const get = values.get.bind(values);
-
-  const getAll = properties =>
-    properties.reduce((accumulator, property) => {
-      accumulator[property] = get(property);
-      return accumulator;
-    }, {});
+  const get = property => values[property];
 
   const allDefined = properties => properties
-    .every(values.has, values);
+    .every(property => values[property] !== undefined);
 
   if (options) {
     Object.keys(options).forEach(property => {
@@ -54,7 +48,7 @@ const Topologica = options => {
 
       functions.set(property, () => {
         if (allDefined(dependencies)) {
-          values.set(property, fn(getAll(dependencies)));
+          values[property] = fn(values);
         }
       });
     });
