@@ -89,17 +89,21 @@ assert.equal(state.get('c'), 7);
 
 ## Asynchronous Functions
 
-Here's an example that uses an asynchronous function.
+Here's an example that uses an asynchronous function. There is no specific functionality in the library for supporting asynchronous functions differently, but this is a recommended pattern for working with them:
+
+ * Use a property for the promise itself, where nothing depends on this property.
+ * Call `.set` asynchronously after the promise resolves.
 
 ```javascript
-
 const state = Topologica({
-  b: λ(
-    async ({a}) => await Promise.resolve(a + 5),
+  bPromise: λ(
+    ({a}) => Promise.resolve(a + 5).then(b => state.set({ b })),
     'a'
   ),
   c: λ(
-    ({b}) => assert.equal(b, 10),
+    ({b}) => {
+      console.log(b); // Prints 10
+    },
     'b'
   )
 });
