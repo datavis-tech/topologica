@@ -27,8 +27,6 @@ const Topologica = options => {
       .forEach(invoke);
   };
 
-  const get = property => values[property];
-
   const allDefined = properties => properties
     .every(property => values[property] !== undefined);
 
@@ -49,7 +47,10 @@ const Topologica = options => {
     });
   }
 
-  return { set, get };
+  return {
+    set,
+    get: () => values
+  };
 };
 
 export default Topologica;

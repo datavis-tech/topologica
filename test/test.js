@@ -13,7 +13,7 @@ describe('Topologica.js', () => {
     state.set({
       foo: 'bar'
     });
-    assert.equal(state.get('foo'), 'bar');
+    assert.equal(state.get().foo, 'bar');
   });
 
   it('Should compute a derived property.', () => {
@@ -23,14 +23,14 @@ describe('Topologica.js', () => {
     state.set({
       a: 5
     });
-    assert.equal(state.get('b'), 6);
+    assert.equal(state.get().b, 6);
   });
 
   it('Should handle uninitialized property.', () => {
     const state = Topologica({
       b: λ(({a}) => a + 1, 'a')
     });
-    assert.equal(state.get('b'), undefined);
+    assert.equal(state.get().b, undefined);
   });
 
   it('Should propagate changes synchronously.', () => {
@@ -41,12 +41,12 @@ describe('Topologica.js', () => {
     state.set({
       a: 2
     });
-    assert.equal(state.get('b'), 3);
+    assert.equal(state.get().b, 3);
 
     state.set({
       a: 99
     });
-    assert.equal(state.get('b'), 100);
+    assert.equal(state.get().b, 100);
   });
 
   it('Should compute a derived property with 2 hops.', () => {
@@ -57,7 +57,7 @@ describe('Topologica.js', () => {
     state.set({
       a: 5
     });
-    assert.equal(state.get('c'), 7);
+    assert.equal(state.get().c, 7);
   });
 
   it('Should handle case of 2 inputs.', () => {
@@ -71,7 +71,7 @@ describe('Topologica.js', () => {
       firstName: 'Fred',
       lastName: 'Flintstone'
     });
-    assert.equal(state.get('fullName'), 'Fred Flintstone');
+    assert.equal(state.get().fullName, 'Fred Flintstone');
   });
 
   it('Should accept an array of strings as dependencies.', () => {
@@ -82,7 +82,7 @@ describe('Topologica.js', () => {
       firstName: 'Fred',
       lastName: 'Flintstone'
     });
-    assert.equal(state.get('fullName'), 'Fred Flintstone');
+    assert.equal(state.get().fullName, 'Fred Flintstone');
   });
 
   it('Should accept a comma delimited string as dependencies.', () => {
@@ -93,7 +93,7 @@ describe('Topologica.js', () => {
       firstName: 'Fred',
       lastName: 'Flintstone'
     });
-    assert.equal(state.get('fullName'), 'Fred Flintstone');
+    assert.equal(state.get().fullName, 'Fred Flintstone');
   });
 
   it('Should only execute when all inputs are defined.', () => {
@@ -107,12 +107,12 @@ describe('Topologica.js', () => {
     state.set({
       lastName: 'Flintstone'
     });
-    assert.equal(state.get('fullName'), undefined);
+    assert.equal(state.get().fullName, undefined);
 
     state.set({
       firstName: 'Wilma'
     });
-    assert.equal(state.get('fullName'), 'Wilma Flintstone');
+    assert.equal(state.get().fullName, 'Wilma Flintstone');
   });
 
   it('Should handle case of 3 inputs.', () => {
@@ -124,7 +124,7 @@ describe('Topologica.js', () => {
       b: 8,
       c: 2
     });
-    assert.equal(state.get('d'), 15);
+    assert.equal(state.get().d, 15);
   });
 
   it('Should handle spaces in input string.', () => {
@@ -136,7 +136,7 @@ describe('Topologica.js', () => {
       b: 8,
       c: 2
     });
-    assert.equal(state.get('d'), 15);
+    assert.equal(state.get().d, 15);
   });
 
   // Data flow graph, read from top to bottom.
@@ -157,7 +157,7 @@ describe('Topologica.js', () => {
       a: 1,
       c: 2
     });
-    assert.equal(state.get('e'), (1 + 1) + (2 + 1));
+    assert.equal(state.get().e, (1 + 1) + (2 + 1));
   });
 
   //      a
@@ -177,12 +177,12 @@ describe('Topologica.js', () => {
     state.set({
       a: 5
     });
-    const a = state.get('a');
+    const a = state.get().a;
     const b = a + 1;
     const c = b + 1;
     const d = a + 1;
     const e = b + d;
-    assert.equal(state.get('e'), e);
+    assert.equal(state.get().e, e);
   });
 
 
@@ -208,7 +208,7 @@ describe('Topologica.js', () => {
     state.set({
       a: 5
     });
-    const a = state.get('a');
+    const a = state.get().a;
     const b = a + 1;
     const c = b + 1;
     const d = c + 1;
@@ -216,7 +216,7 @@ describe('Topologica.js', () => {
     const f = e + 1;
     const g = a + 1;
     const h = d + f + g;
-    assert.equal(state.get('h'), h);
+    assert.equal(state.get().h, h);
   });
 
   it('Should work with booleans.', () => {
@@ -226,7 +226,7 @@ describe('Topologica.js', () => {
     state.set({
       a: false
     });
-    assert.equal(state.get('b'), true);
+    assert.equal(state.get().b, true);
   });
 
   it('Should work with async functions.', done => {
