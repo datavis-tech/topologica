@@ -1,10 +1,8 @@
 const Topologica = require('../dist/topologica.js');
 const assert = require('assert');
 
-const λ = (fn, dependenciesCommaSeparated) => {
-  fn.dependencies = dependenciesCommaSeparated
-    .split(',')
-    .map(str => str.trim());
+const λ = (fn, dependencies) => {
+  fn.dependencies = dependencies;
   return fn;
 };
 
@@ -79,6 +77,17 @@ describe('Topologica.js', () => {
   it('Should accept an array of strings as dependencies.', () => {
     const fullName = ({firstName, lastName}) => `${firstName} ${lastName}`;
     fullName.dependencies = ['firstName', 'lastName'];
+    const state = Topologica({ fullName });
+    state.set({
+      firstName: 'Fred',
+      lastName: 'Flintstone'
+    });
+    assert.equal(state.get('fullName'), 'Fred Flintstone');
+  });
+
+  it('Should accept a comma delimited string as dependencies.', () => {
+    const fullName = ({firstName, lastName}) => `${firstName} ${lastName}`;
+    fullName.dependencies = 'firstName, lastName';
     const state = Topologica({ fullName });
     state.set({
       firstName: 'Fred',
