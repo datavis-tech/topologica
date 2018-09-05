@@ -7,29 +7,25 @@ const parse = dependencies => dependencies.split
 const Topologica = options => {
   const values = {};
   const functions = {};
-  let changed = {};
   const graph = Graph();
 
   const invoke = property => {
     functions[property]();
   };
 
-  const digest = () => {
-    graph
-      .topologicalSort(Object.keys(changed))
-      .forEach(invoke);
-    changed = {};
-  };
-
   const set = options => {
+    const changed = [];
     Object.keys(options).forEach(property => {
       const value = options[property];
       if (values[property] !== value) {
         values[property] = value;
-        changed[property] = true;
+        changed.push(property);
       }
     });
-    digest();
+
+    graph
+      .topologicalSort(changed)
+      .forEach(invoke);
   };
 
   const get = property => values[property];
