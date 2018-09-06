@@ -4,6 +4,15 @@ const parse = dependencies => dependencies.split
   ? dependencies.split(',').map(str => str.trim())
   : dependencies;
 
+const pick = (values, dependencies) => {
+  const onlyDependencies = {};
+  for(let i = 0; i < dependencies.length; i++) {
+    const dependency = dependencies[i];
+    onlyDependencies[dependency] = values[dependency];
+  }
+  return onlyDependencies;
+};
+
 const Topologica = options => {
   const values = {};
   const functions = {};
@@ -41,7 +50,7 @@ const Topologica = options => {
 
       functions[property] = () => {
         if (allDefined(dependencies)) {
-          values[property] = fn(values);
+          values[property] = fn(pick(values, dependencies));
         }
       };
     });
