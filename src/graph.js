@@ -17,14 +17,14 @@ export default () => {
     const visited = {};
     const nodeList = [];
 
-    function DFSVisit(node) {
+    const DFSVisit = node => {
       if (!visited[node]) {
         visit(node);
         nodeList.push(node);
       }
     };
 
-    function visit(node) {
+    const visit = node => {
       visited[node] = true;
       adjacent(node).forEach(DFSVisit);
     }
@@ -42,4 +42,4 @@ export default () => {
     addEdge,
     topologicalSort
   };
-}
+};
