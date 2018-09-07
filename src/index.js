@@ -1,4 +1,4 @@
-import Graph from './graph'
+import Graph from './graph';
 
 const parse = dependencies => dependencies.split
   ? dependencies.split(',').map(str => str.trim())
