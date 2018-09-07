@@ -14,16 +14,13 @@ const Topologica = options => {
   };
 
   const set = options => {
-    const changed = Object.keys(options)
-      .map(property => {
+    graph
+      .topologicalSort(Object.keys(options).map(property => {
         if (values[property] !== options[property]) {
           values[property] = options[property];
           return property;
         }
-      });
-
-    graph
-      .topologicalSort(changed)
+      }))
       .forEach(invoke);
   };
 

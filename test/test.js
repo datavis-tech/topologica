@@ -267,6 +267,25 @@ describe('Topologica.js', () => {
     assert.equal(invocations, 2);
   });
 
+  it('Should propagate changes if a single dependency changes.', () => {
+    let invocations = 0;
+
+    const state = Topologica({
+      c: λ(() => invocations++, 'a, b')
+    });
+
+    assert.equal(invocations, 0);
+
+    state.set({ a: 2, b: 4 });
+    assert.equal(invocations, 1);
+
+    state.set({ a: 2 });
+    assert.equal(invocations, 1);
+
+    state.set({ a: 2, b: 6 });
+    assert.equal(invocations, 2);
+  });
+
   it('Should pass only dependencies into reactive functions.', () => {
     const state = Topologica({
       b: λ(
