@@ -9,7 +9,7 @@ const λ = (fn, dependencies) => {
 describe('Topologica.js', () => {
 
   it('Should set and get a value.', () => {
-    const state = Topologica();
+    const state = Topologica({});
     state.set({
       foo: 'bar'
     });

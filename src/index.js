@@ -37,23 +37,21 @@ const Topologica = options => {
     }) ? arg : null;
   };
 
-  if (options) {
-    Object.keys(options).forEach(property => {
-      const fn = options[property];
-      const dependencies = parse(fn.dependencies)
+  Object.keys(options).forEach(property => {
+    const fn = options[property];
+    const dependencies = parse(fn.dependencies)
 
-      dependencies.forEach(input => {
-        graph.addEdge(input, property);
-      });
-
-      functions[property] = () => {
-        const arg = allDefined(dependencies);
-        if (arg) {
-          values[property] = fn(arg);
-        }
-      };
+    dependencies.forEach(input => {
+      graph.addEdge(input, property);
     });
-  }
+
+    functions[property] = () => {
+      const arg = allDefined(dependencies);
+      if (arg) {
+        values[property] = fn(arg);
+      }
+    };
+  });
 
   return {
     set,
