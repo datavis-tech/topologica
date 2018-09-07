@@ -37,7 +37,7 @@ This introduces the global `Topologica`.
 
 ## Examples
 
- * [Color Picker Example](https://datavis.tech/edit/09fb48921c454e90aa74d72fbe2eb8a0) - Pick a color with 3 sliders.
+ * [Hello Topologica.js!](https://vizhub.com/curran/607a261492e24c308707c3ae413b3981) - Pick a color with 3 sliders.
 
 ## Usage
 
