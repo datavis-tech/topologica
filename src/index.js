@@ -1,4 +1,4 @@
-import Graph from './graph'
+import Graph from './graph';
 
 const parse = dependencies => dependencies.split
   ? dependencies.split(',').map(str => str.trim())
@@ -14,16 +14,13 @@ const Topologica = options => {
   };
 
   const set = options => {
-    const changed = [];
-    Object.keys(options).forEach(property => {
-      if (values[property] !== options[property]) {
-        values[property] = options[property];
-        changed.push(property);
-      }
-    });
-
     graph
-      .topologicalSort(changed)
+      .topologicalSort(Object.keys(options).map(property => {
+        if (values[property] !== options[property]) {
+          values[property] = options[property];
+          return property;
+        }
+      }))
       .forEach(invoke);
   };
 
@@ -37,23 +34,21 @@ const Topologica = options => {
     }) ? arg : null;
   };
 
-  if (options) {
-    Object.keys(options).forEach(property => {
-      const fn = options[property];
-      const dependencies = parse(fn.dependencies)
+  Object.keys(options).forEach(property => {
+    const fn = options[property];
+    const dependencies = parse(fn.dependencies)
 
-      dependencies.forEach(input => {
-        graph.addEdge(input, property);
-      });
-
-      functions[property] = () => {
-        const arg = allDefined(dependencies);
-        if (arg) {
-          values[property] = fn(arg);
-        }
-      };
+    dependencies.forEach(input => {
+      graph.addEdge(input, property);
     });
-  }
+
+    functions[property] = () => {
+      const arg = allDefined(dependencies);
+      if (arg) {
+        values[property] = fn(arg);
+      }
+    };
+  });
 
   return {
     set,
