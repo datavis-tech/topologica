@@ -27,12 +27,17 @@ const Topologica = options => {
       .forEach(invoke);
   };
 
-  let dependenciesObject;
-  const defined = property => {
-    if (values[property] !== undefined) {
-      dependenciesObject[property] = values[property];
-      return true;
+  const allDefined = dependencies => {
+    const dependenciesObject = {};
+    const defined = property => {
+      if (values[property] !== undefined) {
+        dependenciesObject[property] = values[property];
+        return true;
+      }
     }
+    return dependencies.every(defined)
+      ? dependenciesObject
+      : null;
   }
 
   if (options) {
@@ -45,8 +50,8 @@ const Topologica = options => {
       });
 
       functions[property] = () => {
-        dependenciesObject = {};
-        if (dependencies.every(defined)) {
+        const dependenciesObject = allDefined(dependencies);
+        if (dependenciesObject) {
           values[property] = fn(dependenciesObject);
         }
       };
