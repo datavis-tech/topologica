@@ -1,6 +1,6 @@
 {
   "name": "topologica",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "Minimal library for reactive dataflow programming.",
   "main": "dist/topologica.min.js",
   "scripts": {
