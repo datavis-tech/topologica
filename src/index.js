@@ -27,18 +27,13 @@ const Topologica = options => {
       .forEach(invoke);
   };
 
-  const allDefined = dependencies => {
-    const dependenciesObject = {};
-    const defined = property => {
-      if (values[property] !== undefined) {
-        dependenciesObject[property] = values[property];
-        return true;
-      }
-    }
-    return dependencies.every(defined)
-      ? dependenciesObject
-      : null;
-  }
+  const defined = property => values[property] !== undefined;
+
+  const pick = properties => properties
+    .reduce((accumulator, property) => {
+      accumulator[property] = values[property];
+      return accumulator;
+    }, {});
 
   if (options) {
     Object.keys(options).forEach(property => {
@@ -50,9 +45,8 @@ const Topologica = options => {
       });
 
       functions[property] = () => {
-        const dependenciesObject = allDefined(dependencies);
-        if (dependenciesObject) {
-          values[property] = fn(dependenciesObject);
+        if (dependencies.every(defined)) {
+          values[property] = fn(pick(dependencies));
         }
       };
     });
