@@ -4,15 +4,6 @@ const parse = dependencies => dependencies.split
   ? dependencies.split(',').map(str => str.trim())
   : dependencies;
 
-const pick = (values, dependencies) => {
-  const onlyDependencies = {};
-  for(let i = 0; i < dependencies.length; i++) {
-    const dependency = dependencies[i];
-    onlyDependencies[dependency] = values[dependency];
-  }
-  return onlyDependencies;
-};
-
 const Topologica = options => {
   const values = {};
   const functions = {};
@@ -36,8 +27,13 @@ const Topologica = options => {
       .forEach(invoke);
   };
 
-  const allDefined = properties => properties
-    .every(property => values[property] !== undefined);
+  let dependenciesObject;
+  const defined = property => {
+    if (values[property] !== undefined) {
+      dependenciesObject[property] = values[property];
+      return true;
+    }
+  }
 
   if (options) {
     Object.keys(options).forEach(property => {
@@ -49,8 +45,9 @@ const Topologica = options => {
       });
 
       functions[property] = () => {
-        if (allDefined(dependencies)) {
-          values[property] = fn(pick(values, dependencies));
+        dependenciesObject = {};
+        if (dependencies.every(defined)) {
+          values[property] = fn(dependenciesObject);
         }
       };
     });
