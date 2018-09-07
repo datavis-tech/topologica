@@ -1,9 +1,9 @@
 # Topologica.js
-A minimal library for [reactive](https://en.wikipedia.org/wiki/Reactive_programming) [dataflow programming](https://en.wikipedia.org/wiki/Dataflow_programming). Weighs [1.2KB minified](https://unpkg.com/topologica).
+A minimal library for [reactive](https://en.wikipedia.org/wiki/Reactive_programming) [dataflow programming](https://en.wikipedia.org/wiki/Dataflow_programming). Weighs [1KB minified](https://unpkg.com/topologica).
 
-This library provides an abstraction for **reactive data flows**. This means you can define functions in terms of their inputs (dependencies) and outputs, and the library will take care of executing _only_ the required functions to propagate changes through the data flow graph, in the correct order. The ordering of change propagation through the data flow graph is determined using the [topological sorting algorithm](https://en.wikipedia.org/wiki/Topological_sorting) (hence the name _Topologica_).  
+This library provides an abstraction for **reactive data flows**. This means you can declaratively specify computed state as functions of their dependencies, and the library will take care of executing _only_ the required functions to propagate changes through the data flow graph, in the correct order. The ordering of change propagation through the data flow graph is determined using the [topological sorting algorithm](https://en.wikipedia.org/wiki/Topological_sorting), hence the name _Topologica_.
 
-This library is primarily intended for use in creating user interfaces and data visualizations using [D3.js](https://d3js.org/) and [Redux](https://redux.js.org/). The problem with using straight Redux and a functional component approach with data visualizations is that it leads to unnecessary execution of heavyweight computations over data on every render. For example, if you change the highlighted element, or the text of an axis label, the entire visualization including scales and rendering of marks would be recomputed. By using Topologica within visualization components, you can improve performance by only executing heavy computations when they are required.
+This library is primarily intended for use in optimizing interactive data visualizations created using [D3.js](https://d3js.org/) and a unidirectional data flow approach. The problem with using unidirectional data flow with interactive data visualizations is that it leads to **unnecessary execution of heavyweight computations over data on every render**. For example, if you change the highlighted element, or the text of an axis label, the entire visualization including scales and rendering of all marks would be recomputed and re-rendered to the DOM unnecessarily. Topologica.js lets you improve performance by only executing heavy computation and rendering operations when they are actually required.
 
 Why use topological sorting? In the following data flow graph, propagation using [breadth-first search](https://en.wikipedia.org/wiki/Breadth-first_search) (which is what [Model.js](https://github.com/curran/model) and some other libraries use) would cause `e` to be set twice, and the first time it would be set with an *inconsistent state* (as occurs with ["glitches" in reactive programming](https://en.wikipedia.org/wiki/Reactive_programming#Glitches)). Using topological sorting for change propagation guarantees that `e` will only be set once, and there will never be inconsistent states.
 
@@ -41,7 +41,7 @@ This introduces the global `Topologica`.
 
 ## Usage
 
-You can define _reactive functions_ that compute properties that depend on other properties as input. These properties exist on objects that are instances of `Topologica`, so in a sense they are namespaced rather than free-floating. For example, consider the following example where `b` gets set to `a + 1` whenever `a` changes.
+You can define _reactive functions_ that compute properties that depend on other properties as input. These properties exist on instances of `Topologica`, so in a sense they are namespaced rather than free-floating. For example, consider the following example where `b` gets set to `a + 1` whenever `a` changes.
 
 ```javascript
 // First, define a function that accepts an options object as an argument.
@@ -57,7 +57,7 @@ const state = Topologica({ b });
 state.set({ a: 2 });
 
 // You can use state.get to retreive computed values.
-assert.equal(state.get('b'), 3);
+assert.equal(state.get().b, 3);
 ```
 
 <p align="center">
@@ -78,7 +78,7 @@ c.dependencies = ['b'];
 const state = Topologica({ b, c });
 
 state.set({ a: 5 });
-assert.equal(state.get('c'), 7);
+assert.equal(state.get().c, 7);
 ```
 
 <p align="center">
@@ -129,14 +129,14 @@ fullName.dependencies = 'firstName, lastName';
 const state = Topologica({ fullName });
 
 state.set({ firstName: 'Fred', lastName: 'Flintstone' });
-assert.equal(state.get('fullName'), 'Fred Flintstone');
+assert.equal(state.get().fullName'), 'Fred Flintstone');
 ```
 
 Now if either firstName or `lastName` changes, `fullName` will be updated (synchronously).
 
 ```js
 state.set({ firstName: 'Wilma' });
-assert.equal(state.get('fullName'), 'Wilma Flintstone');
+assert.equal(state.get().fullName'), 'Wilma Flintstone');
 ```
 
 <p align="center">
@@ -207,7 +207,7 @@ const b = a + 1;
 const c = b + 1;
 const d = a + 1;
 const e = b + d;
-assert.equal(state.get('e'), e);
+assert.equal(state.get().e, e);
 ```
 
 For more examples, have a look at the [tests](/test/test.js).
