@@ -267,6 +267,20 @@ describe('Topologica.js', () => {
     assert.equal(invocations, 2);
   });
 
+  it('Should pass only dependencies into reactive functions.', () => {
+    const state = Topologica({
+      b: λ(
+        props => Object.keys(props),
+        'a'
+      )
+    });
+    state.set({
+      a: 'Foo',
+      foo: 'Bar'
+    });
+    assert.deepEqual(state.get().b, ['a']);
+  });
+
   it('Should be fast.', () => {
     const state = Topologica({
       b: λ(({a}) => a + 1, 'a'),
@@ -292,4 +306,5 @@ describe('Topologica.js', () => {
     console.log('Average: ' + (totalTime / numRuns));
     // 468.9
   }).timeout(7000);
+
 });
