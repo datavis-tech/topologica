@@ -38,6 +38,7 @@ This introduces the global `Topologica`.
 ## Examples
 
  * [Hello Topologica.js!](https://vizhub.com/curran/607a261492e24c308707c3ae413b3981) - Pick a color with 3 sliders.
+ * [Bowl of Fruit - Topologica Experiment](https://vizhub.com/curran/27c261085d8a48618c69f7983672903b)
 
 ## Usage
 
@@ -129,14 +130,14 @@ fullName.dependencies = 'firstName, lastName';
 const state = Topologica({ fullName });
 
 state.set({ firstName: 'Fred', lastName: 'Flintstone' });
-assert.equal(state.get().fullName'), 'Fred Flintstone');
+assert.equal(state.get().fullName, 'Fred Flintstone');
 ```
 
 Now if either firstName or `lastName` changes, `fullName` will be updated (synchronously).
 
 ```js
 state.set({ firstName: 'Wilma' });
-assert.equal(state.get().fullName'), 'Wilma Flintstone');
+assert.equal(state.get().fullName, 'Wilma Flintstone');
 ```
 
 <p align="center">
