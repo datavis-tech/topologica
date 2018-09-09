@@ -16,6 +16,11 @@ describe('Topologica.js', () => {
     assert.equal(state.get().foo, 'bar');
   });
 
+  it('Should chain set.', () => {
+    const state = Topologica({}).set({ foo: 'bar' });
+    assert.equal(state.get().foo, 'bar');
+  });
+
   it('Should compute a derived property.', () => {
     const state = Topologica({
       b: λ(({a}) => a + 1, 'a')
