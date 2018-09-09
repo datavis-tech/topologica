@@ -75,11 +75,11 @@ b.dependencies = ['a'];
 const c = ({b}) => b + 1;
 c.dependencies = ['b'];
 
-const state = Topologica({ b, c });
-
-state.set({ a: 5 });
+const state = Topologica({ b, c }).set({ a: 5 });
 assert.equal(state.get().c, 7);
 ```
+
+Note that `set` returns the `Topologica` instance, so it is chainable.
 
 <p align="center">
   <img src="https://cloud.githubusercontent.com/assets/68416/15385597/44a10522-1dc0-11e6-9054-2150f851db46.png">
