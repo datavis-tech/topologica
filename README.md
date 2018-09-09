@@ -30,7 +30,7 @@ import Topologica from 'topologica';
 You can also include the library in a script tag from Unpkg, like this:
 
 ```html
-<script src="https://unpkg.com/topologica@3.0.0/dist/topologica.min.js"></script>
+<script src="https://unpkg.com/topologica@3.1.0/dist/topologica.min.js"></script>
 ```
 
 This introduces the global `Topologica`.
