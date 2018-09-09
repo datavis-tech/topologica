@@ -13,7 +13,7 @@ const Topologica = options => {
     functions[property]();
   };
 
-  const set = options => {
+  const set = function(options) {
     graph
       .topologicalSort(Object.keys(options).map(property => {
         if (values[property] !== options[property]) {
@@ -22,6 +22,7 @@ const Topologica = options => {
         }
       }))
       .forEach(invoke);
+    return this;
   };
 
   const allDefined = dependencies => {
