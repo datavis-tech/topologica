@@ -47,7 +47,9 @@ export default options => {
         values[property] = options[property];
         return property;
       }
-    })).reverse().forEach(invoke);
+    }))
+      .reverse()
+      .forEach(invoke);
     return this;
   };
 
