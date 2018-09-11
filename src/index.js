@@ -1,4 +1,6 @@
-const Topologica = options => {
+const keys = Object.keys;
+
+export default options => {
   const values = {};
   const functions = {};
   const edges = {};
@@ -40,7 +42,7 @@ const Topologica = options => {
   };
 
   const set = function(options) {
-    depthFirstSearch(Object.keys(options).map(property => {
+    depthFirstSearch(keys(options).map(property => {
       if (values[property] !== options[property]) {
         values[property] = options[property];
         return property;
@@ -59,7 +61,7 @@ const Topologica = options => {
     }) ? arg : null;
   };
 
-  Object.keys(options).forEach(property => {
+  keys(options).forEach(property => {
     const reactiveFunction = options[property];
     let dependencies = reactiveFunction.dependencies;
     const fn = dependencies ? reactiveFunction : reactiveFunction[0];
@@ -86,5 +88,3 @@ const Topologica = options => {
     get: () => values
   };
 };
-
-export default Topologica;
