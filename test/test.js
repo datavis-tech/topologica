@@ -101,6 +101,19 @@ describe('Topologica.js', () => {
     assert.equal(state.get().fullName, 'Fred Flintstone');
   });
 
+  it('Should accept reactive function as an array.', () => {
+    const fullName = [
+      ({firstName, lastName}) => `${firstName} ${lastName}`,
+      ['firstName', 'lastName']
+    ]
+    const state = Topologica({ fullName });
+    state.set({
+      firstName: 'Fred',
+      lastName: 'Flintstone'
+    });
+    assert.equal(state.get().fullName, 'Fred Flintstone');
+  });
+
   it('Should only execute when all inputs are defined.', () => {
     const state = Topologica({
       fullName: λ(
