@@ -37,12 +37,12 @@ const Topologica = options => {
 
   Object.keys(options).forEach(property => {
     const reactiveFunction = options[property];
+    const isArray = Array.isArray(reactiveFunction);
 
-    let [fn, dependencies] = Array.isArray(reactiveFunction)
-      ? reactiveFunction
-      : [reactiveFunction, reactiveFunction.dependencies];
-
-    dependencies = parse(dependencies);
+    const fn = isArray ? reactiveFunction[0] : reactiveFunction;
+    const dependencies = parse(
+      isArray ? reactiveFunction[1] : reactiveFunction.dependencies
+    );
 
     dependencies.forEach(input => {
       graph.addEdge(input, property);
