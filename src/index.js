@@ -1,8 +1,13 @@
 import Graph from './graph';
 
-const parse = dependencies => dependencies.split
+const parseDependencies = dependencies => dependencies.split
   ? dependencies.split(',').map(str => str.trim())
   : dependencies;
+
+const parseReactiveFunction = fn =>
+  fn.dependencies
+    ? [fn, fn.dependencies]
+    : fn;
 
 const Topologica = options => {
   const values = {};
@@ -36,9 +41,8 @@ const Topologica = options => {
   };
 
   Object.keys(options).forEach(property => {
-    let fn = options[property];
-    const dependencies = parse(fn.dependencies || fn[1]);
-    fn = fn.dependencies ? fn : fn[0];
+    let [ fn, dependencies ] = parseReactiveFunction(options[property]);
+    dependencies = parseDependencies(dependencies);
 
     dependencies.forEach(input => {
       graph.addEdge(input, property);
