@@ -41,7 +41,11 @@ This script tag introduces the global `Topologica`.
 
 Constructs a new data flow graph with the given <i>reactiveFunctions</i> argument, an object whose keys are the names of computed properties and whose values are reactive functions.
 
-A reactive function is a function that has an explicit representation of its dependencies.
+```js
+const dataflow = Topologica({ fullName });
+```
+
+A reactive function accepts a single argument, an object containing values for its dependencies, and has an explicit representation of its dependencies. A reactive function can either be represented as a **function** with a _dependencies_ property, or as an **array** where the first element is the function and the second element is the dependencies. Dependencies can be represented either as an array of property name strings, or as a comma delimited string of property names.
 
 <table>
   <thead>
@@ -57,7 +61,8 @@ A reactive function is a function that has an explicit representation of its dep
       <td><pre lang="js">const fullName =
   ({firstName, lastName}) =>
     ${firstName} ${lastName};
-fullName.dependencies = ['firstName', 'lastName'];</pre></td>
+fullName.dependencies =
+  ['firstName', 'lastName'];</pre></td>
       <td><pre lang="js">const fullName = [
   ({firstName, lastName}) =>
     ${firstName} ${lastName},
@@ -69,7 +74,8 @@ fullName.dependencies = ['firstName', 'lastName'];</pre></td>
       <td><pre lang="js">const fullName =
   ({firstName, lastName}) =>
     ${firstName} ${lastName};
-fullName.dependencies = 'firstName, lastName';</pre></td>
+fullName.dependencies =
+  'firstName, lastName';</pre></td>
       <td><pre lang="js">const fullName = [
   ({firstName, lastName}) =>
     ${firstName} ${lastName},
@@ -78,6 +84,8 @@ fullName.dependencies = 'firstName, lastName';</pre></td>
     </tr>
   </tbody>
 </table>
+
+This table shows all 4 ways of defining a reactive function.
 
 ## Usage Examples
 
