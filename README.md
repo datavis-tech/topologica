@@ -54,8 +54,9 @@ A reactive function is a function that has an explicit representation of its dep
   <tbody>
     <tr>
       <td>Dependencies array</td>
-      <td><pre lang="js">const fullName = ({firstName, lastName}) =>
-  ${firstName} ${lastName};
+      <td><pre lang="js">const fullName =
+  ({firstName, lastName}) =>
+    ${firstName} ${lastName};
 fullName.dependencies = ['firstName', 'lastName'];</pre></td>
       <td><pre lang="js">const fullName = [
   ({firstName, lastName}) =>
@@ -65,8 +66,9 @@ fullName.dependencies = ['firstName', 'lastName'];</pre></td>
     </tr>
     <tr>
       <td>Dependencies string</td>
-      <td><pre lang="js">const fullName = ({firstName, lastName}) =>
-  ${firstName} ${lastName};
+      <td><pre lang="js">const fullName =
+  ({firstName, lastName}) =>
+    ${firstName} ${lastName};
 fullName.dependencies = 'firstName, lastName';</pre></td>
       <td><pre lang="js">const fullName = [
   ({firstName, lastName}) =>
