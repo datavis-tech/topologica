@@ -43,10 +43,39 @@ Constructs a new data flow graph with the given <i>reactiveFunctions</i> argumen
 
 A reactive function is a function that has an explicit representation of its dependencies.
 
-|                     | function | array |
-|---------------------|----------|-------|
-| Dependencies array  |<pre>const fullName = ({firstName, lastName}) =>`${firstName} ${lastName}`;fullName.dependencies = 'firstName, lastName';</pre>|       |
-| Dependencies string |          |       |
+<table>
+  <thead>
+    <tr>
+      <th></th>
+      <th>function</th>
+      <th>array</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Dependencies array</td>
+      <td><pre lang="js">const fullName = ({firstName, lastName}) =>
+  ${firstName} ${lastName};
+fullName.dependencies = ['firstName', 'lastName'];</pre></td>
+      <td><pre lang="js">const fullName = [
+  ({firstName, lastName}) =>
+    ${firstName} ${lastName},
+  ['firstName', 'lastName']
+];</pre></td>
+    </tr>
+    <tr>
+      <td>Dependencies string</td>
+      <td><pre lang="js">const fullName = ({firstName, lastName}) =>
+  ${firstName} ${lastName};
+fullName.dependencies = 'firstName, lastName';</pre></td>
+      <td><pre lang="js">const fullName = [
+  ({firstName, lastName}) =>
+    ${firstName} ${lastName},
+  'firstName, lastName'
+];</pre></td>
+    </tr>
+  </tbody>
+</table>
 
 ## Usage Examples
 
