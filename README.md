@@ -3,7 +3,7 @@ A library for [reactive programming](https://en.wikipedia.org/wiki/Reactive_prog
 
 This library provides an abstraction for **reactive data flows**. This means you can declaratively specify computed state as functions of their dependencies, and the library will take care of executing _only_ the required functions to propagate changes through the data flow graph, in the correct order. The ordering of change propagation through the data flow graph is determined using the [topological sorting algorithm](https://en.wikipedia.org/wiki/Topological_sorting), hence the name _Topologica_.
 
-This library is primarily intended for use in optimizing interactive data visualizations created using [D3.js](https://d3js.org/) and a unidirectional data flow approach. The problem with using unidirectional data flow with interactive data visualizations is that it leads to **unnecessary execution of heavyweight computations over data on every render**. For example, if you change the highlighted element, or the text of an axis label, the entire visualization including scales and rendering of all marks would be recomputed and re-rendered to the DOM unnecessarily. Topologica.js lets you improve performance by only executing heavy computation and rendering operations when they are actually required.
+Topologica is primarily intended for use in optimizing interactive data visualizations created using [D3.js](https://d3js.org/) and a unidirectional data flow approach. The problem with using unidirectional data flow with interactive data visualizations is that it leads to **unnecessary execution of heavyweight computations over data on every render**. For example, if you change the highlighted element, or the text of an axis label, the entire visualization including scales and rendering of all marks would be recomputed and re-rendered to the DOM unnecessarily. Topologica.js lets you improve performance by only executing heavy computation and rendering operations when they are actually required.
 
 Why use topological sorting? In the following data flow graph, propagation using [breadth-first search](https://en.wikipedia.org/wiki/Breadth-first_search) (which is what [Model.js](https://github.com/curran/model) and some other libraries use) would cause `e` to be set twice, and the first time it would be set with an *inconsistent state* (as occurs with ["glitches" in reactive programming](https://en.wikipedia.org/wiki/Reactive_programming#Glitches)). Using topological sorting for change propagation guarantees that `e` will only be set once, and there will never be inconsistent states.
 
@@ -33,14 +33,18 @@ You can also include the library in a script tag from Unpkg, like this:
 <script src="https://unpkg.com/topologica@3.1.0/dist/topologica.min.js"></script>
 ```
 
-This introduces the global `Topologica`.
+This script tag introduces the global `Topologica`.
 
-## Examples
+## API Reference
+
+
+
+## Usage Examples
+
+External running examples:
 
  * [Hello Topologica.js!](https://vizhub.com/curran/607a261492e24c308707c3ae413b3981) - Pick a color with 3 sliders.
- * [Bowl of Fruit - Topologica Experiment](https://vizhub.com/curran/27c261085d8a48618c69f7983672903b)
-
-## Usage
+ * [Bowl of Fruit - Topologica Experiment](https://vizhub.com/curran/27c261085d8a48618c69f7983672903b) - A proposed approach for using Topologica for local state of D3-based components.
 
 You can define _reactive functions_ that compute properties that depend on other properties as input. These properties exist on instances of `Topologica`, so in a sense they are namespaced rather than free-floating. For example, consider the following example where `b` gets set to `a + 1` whenever `a` changes.
 
@@ -88,7 +92,7 @@ Note that `set` returns the `Topologica` instance, so it is chainable.
   Here, b is both an output and an input.
 </p>
 
-## Asynchronous Functions
+### Asynchronous Functions
 
 Here's an example that uses an asynchronous function. There is no specific functionality in the library for supporting asynchronous functions differently, but this is a recommended pattern for working with them:
 
@@ -117,7 +121,7 @@ state.set({ a: 5 });
   Asynchronous functions cut the dependency graph.
 </p>
 
-## Complex Dependency Graphs
+### Complex Dependency Graphs
 
 The dependency graphs within an instance of Topologa can be arbitrarily complex [directed acyclic graphs](https://en.wikipedia.org/wiki/Directed_acyclic_graph). This section shows some examples building in complexity.
 
