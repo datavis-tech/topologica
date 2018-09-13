@@ -37,7 +37,16 @@ This script tag introduces the global `Topologica`.
 
 ## API Reference
 
+<a name="topologica-constructor" href="#topologica-constructor">#</a> <b>Topologica</b>(<i>reactiveFunctions</i>)
 
+Constructs a new data flow graph with the given <i>reactiveFunctions</i> argument, an object whose keys are the names of computed properties and whose values are reactive functions.
+
+A reactive function is a function that has an explicit representation of its dependencies.
+
+|                     | function | array |
+|---------------------|----------|-------|
+| Dependencies array  |<pre>const fullName = ({firstName, lastName}) =>`${firstName} ${lastName}`;fullName.dependencies = 'firstName, lastName';</pre>|       |
+| Dependencies string |          |       |
 
 ## Usage Examples
 
