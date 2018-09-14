@@ -5,41 +5,8 @@ export default options => {
   const functions = {};
   const edges = {};
 
-  const depthFirstSearch = sourceNodes => {
-    const visited = {};
-    const nodeList = [];
-
-    const depthFirstSearch = node => {
-      if (!visited[node]) {
-        visit(node);
-        nodeList.push(node);
-      }
-    };
-
-    const visit = node => {
-      visited[node] = true;
-      edges[node] && edges[node].forEach(depthFirstSearch);
-    }
-
-    sourceNodes.forEach(visit);
-
-    return nodeList;
-  }
-
   const invoke = property => {
     functions[property]();
-  };
-
-  const set = function(options) {
-    depthFirstSearch(keys(options).map(property => {
-      if (state[property] !== options[property]) {
-        state[property] = options[property];
-        return property;
-      }
-    }))
-      .reverse()
-      .forEach(invoke);
-    return this;
   };
 
   const allDefined = dependencies => {
@@ -73,6 +40,39 @@ export default options => {
       }
     };
   });
+
+  const depthFirstSearch = sourceNodes => {
+    const visited = {};
+    const nodeList = [];
+
+    const search = node => {
+      if (!visited[node]) {
+        visit(node);
+        nodeList.push(node);
+      }
+    };
+
+    const visit = node => {
+      visited[node] = true;
+      edges[node] && edges[node].forEach(search);
+    }
+
+    sourceNodes.forEach(visit);
+
+    return nodeList;
+  }
+
+  const set = function(options) {
+    depthFirstSearch(keys(options).map(property => {
+      if (state[property] !== options[property]) {
+        state[property] = options[property];
+        return property;
+      }
+    }))
+      .reverse()
+      .forEach(invoke);
+    return this;
+  };
 
   return {
     set,
