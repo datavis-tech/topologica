@@ -5,7 +5,7 @@ This library provides an abstraction for **reactive data flows**. This means you
 
 Topologica is primarily intended for use in optimizing interactive data visualizations created using [D3.js](https://d3js.org/) and a unidirectional data flow approach. The problem with using unidirectional data flow with interactive data visualizations is that it leads to **unnecessary execution of heavyweight computations over data on every render**. For example, if you change the highlighted element, or the text of an axis label, the entire visualization including scales and rendering of all marks would be recomputed and re-rendered to the DOM unnecessarily. Topologica.js lets you improve performance by only executing heavy computation and rendering operations when they are actually required. It also allows you to simplify your code by splitting it into logical chunks based on reactive functions, and makes it so you don't need to think about order of execution at all.
 
-Why use topological sorting? In the following data flow graph, propagation using [breadth-first search](https://en.wikipedia.org/wiki/Breadth-first_search) (which is what [Model.js](https://github.com/curran/model) and some other libraries use) would cause `e` to be set twice, and the first time it would be set with an *inconsistent state* (as occurs with ["glitches" in reactive programming](https://en.wikipedia.org/wiki/Reactive_programming#Glitches)). Using topological sorting for change propagation guarantees that `e` will only be set once, and there will never be inconsistent states.
+Why use topological sorting? To **avoid inconsistent state.** In the following data flow graph, propagation using [breadth-first search](https://en.wikipedia.org/wiki/Breadth-first_search) (which is what [Model.js](https://github.com/curran/model) and some other libraries use) would cause `e` to be set twice, and the first time it would be set with an *inconsistent state* (as occurs with ["glitches" in reactive programming](https://en.wikipedia.org/wiki/Reactive_programming#Glitches)). Using topological sorting for change propagation guarantees that `e` will only be set once, and there will never be inconsistent states.
 
 <p align="center">
   <img src="https://cloud.githubusercontent.com/assets/68416/15400254/7f779c9a-1e08-11e6-8992-9d2362bfba63.png">
@@ -112,6 +112,8 @@ Gets the current state of all properties, including derived properties.
 const state = dataflow.get();
 console.log(state.fullName); // Prints 'Fred Flintstone'
 ```
+
+Assigning values directly to the returned `state` object (for example `state.firstName = 'Wilma'`) will _not_ trigger reactive functions. Use [set](#set) instead.
 
 ## Usage Examples
 
