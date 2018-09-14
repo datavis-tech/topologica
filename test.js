@@ -349,7 +349,6 @@ describe('Topologica.js', () => {
       console.log(time);
     }
     console.log('Average: ' + (totalTime / numRuns));
-    // 468.9
   }).timeout(7000);
 
 });
