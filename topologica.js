@@ -4,13 +4,12 @@ export default options => {
   const state = {};
   const functions = {};
   const edges = {};
-  const adjacent = node => edges[node] || [];
 
   const depthFirstSearch = sourceNodes => {
     const visited = {};
     const nodeList = [];
 
-    const DFSVisit = node => {
+    const depthFirstSearch = node => {
       if (!visited[node]) {
         visit(node);
         nodeList.push(node);
@@ -19,7 +18,7 @@ export default options => {
 
     const visit = node => {
       visited[node] = true;
-      adjacent(node).forEach(DFSVisit);
+      edges[node] && edges[node].forEach(depthFirstSearch);
     }
 
     sourceNodes.forEach(visit);
@@ -64,7 +63,7 @@ export default options => {
       : dependencies;
 
     dependencies.forEach(input => {
-      (edges[input] = adjacent(input)).push(property);
+      (edges[input] = edges[input] || []).push(property);
     });
 
     functions[property] = () => {
