@@ -42,7 +42,7 @@ This script tag introduces the global `Topologica`.
 Constructs a new data flow graph with the given <i>reactiveFunctions</i> argument, an object whose keys are the names of computed properties and whose values are reactive functions.
 
 ```js
-const dataflow = Topologica({ fullName });
+const topologica = Topologica({ fullName });
 ```
 
 A reactive function accepts a single argument, an object containing values for its dependencies, and has an explicit representation of its dependencies. A reactive function can either be represented as a **function** with a _dependencies_ property, or as an **array** where the first element is the function and the second element is the dependencies. Dependencies can be represented either as an array of property name strings, or as a comma delimited string of property names.
@@ -85,7 +85,10 @@ fullName.dependencies =
   </tbody>
 </table>
 
-This table shows all 4 ways of defining a reactive function.
+This table shows all 4 ways of defining a reactive function, each of which may be useful in different contexts.
+
+ * **dependencies** If you are typing the dependencies by hand, it makes sense to use the comma-delimited string variant, so that you can easily copy-paste between it and a destructuring assignment (most common case). If you are deriving dependencies programmatically, it makes sense to use the array variant instead.
+ * **reactive functions** If you want to define a reactive function in a self-contained way, for example as a separate module, it makes sense to use the variant where you specify `.dependencies` on a function (most common case). If you want to define multiple smaller reactive functions as a group, for example in the statement that constructs the Topologica instance, then it makes sense to use the more compact two element array variant.
 
 ## Usage Examples
 
