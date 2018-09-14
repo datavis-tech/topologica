@@ -1,6 +1,6 @@
 const keys = Object.keys;
 
-export default options => {
+export default reactiveFunctions => {
   const state = {};
   const functions = {};
   const edges = {};
@@ -19,8 +19,8 @@ export default options => {
     }) ? arg : null;
   };
 
-  keys(options).forEach(property => {
-    const reactiveFunction = options[property];
+  keys(reactiveFunctions).forEach(property => {
+    const reactiveFunction = reactiveFunctions[property];
     let dependencies = reactiveFunction.dependencies;
     const fn = dependencies ? reactiveFunction : reactiveFunction[0];
     dependencies = dependencies || reactiveFunction[1];
@@ -62,10 +62,10 @@ export default options => {
     return nodeList;
   }
 
-  const set = function(options) {
-    depthFirstSearch(keys(options).map(property => {
-      if (state[property] !== options[property]) {
-        state[property] = options[property];
+  const set = function(stateChange) {
+    depthFirstSearch(keys(stateChange).map(property => {
+      if (state[property] !== stateChange[property]) {
+        state[property] = stateChange[property];
         return property;
       }
     }))

@@ -37,7 +37,7 @@ This script tag introduces the global `Topologica`.
 
 ## API Reference
 
-<a name="topologica-constructor" href="#topologica-constructor">#</a> <b>Topologica</b>(<i>reactiveFunctions</i>)
+<a name="constructor" href="#constructor">#</a> <b>Topologica</b>(<i>reactiveFunctions</i>)
 
 Constructs a new data flow graph with the given <i>reactiveFunctions</i> argument, an object whose keys are the names of computed properties and whose values are reactive functions. By convention, the variable name `dataflow` is used for instances of Topologica, because they are reactive data flow graphs.
 
