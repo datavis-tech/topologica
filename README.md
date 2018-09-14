@@ -128,13 +128,13 @@ const b = ({a}) => a + 1;
 b.dependencies = ['a'];
 
 // Pass this function into the Topologica constructor.
-const state = Topologica({ b });
+const dataflow = Topologica({ b });
 
 // Setting the value of a will synchronously propagate changes to B.
-state.set({ a: 2 });
+dataflow.set({ a: 2 });
 
-// You can use state.get to retreive computed values.
-assert.equal(state.get().b, 3);
+// You can use dataflow.get to retreive computed values.
+assert.equal(dataflow.get().b, 3);
 ```
 
 <p align="center">
@@ -152,8 +152,8 @@ b.dependencies = ['a'];
 const c = ({b}) => b + 1;
 c.dependencies = ['b'];
 
-const state = Topologica({ b, c }).set({ a: 5 });
-assert.equal(state.get().c, 7);
+const dataflow = Topologica({ b, c }).set({ a: 5 });
+assert.equal(dataflow.get().c, 7);
 ```
 
 Note that `set` returns the `Topologica` instance, so it is chainable.
@@ -172,9 +172,9 @@ Here's an example that uses an asynchronous function. There is no specific funct
  * Call `.set` asynchronously after the promise resolves.
 
 ```javascript
-const state = Topologica({
+const dataflow = Topologica({
   bPromise: λ(
-    ({a}) => Promise.resolve(a + 5).then(b => state.set({ b })),
+    ({a}) => Promise.resolve(a + 5).then(b => dataflow.set({ b })),
     'a'
   ),
   c: λ(
@@ -184,7 +184,7 @@ const state = Topologica({
     'b'
   )
 });
-state.set({ a: 5 });
+dataflow.set({ a: 5 });
 ```
 
 <p align="center">
@@ -203,17 +203,17 @@ Here's an example that computes a person's full name from their first name and a
 const fullName = ({firstName, lastName}) => `${firstName} ${lastName}`;
 fullName.dependencies = 'firstName, lastName';
 
-const state = Topologica({ fullName });
+const dataflow = Topologica({ fullName });
 
-state.set({ firstName: 'Fred', lastName: 'Flintstone' });
-assert.equal(state.get().fullName, 'Fred Flintstone');
+dataflow.set({ firstName: 'Fred', lastName: 'Flintstone' });
+assert.equal(dataflow.get().fullName, 'Fred Flintstone');
 ```
 
 Now if either firstName or `lastName` changes, `fullName` will be updated (synchronously).
 
 ```js
-state.set({ firstName: 'Wilma' });
-assert.equal(state.get().fullName, 'Wilma Flintstone');
+dataflow.set({ firstName: 'Wilma' });
+assert.equal(dataflow.get().fullName, 'Wilma Flintstone');
 ```
 
 <p align="center">
@@ -241,7 +241,7 @@ While this convenience function is useful for the examples here in this README, 
 Here's the previous example re-written to use this convenience function.
 
 ```js
-const state = Topologica({
+const dataflow = Topologica({
   fullName: λ(
     ({firstName, lastName}) => `${firstName} ${lastName}`,
     'firstName, lastName'
@@ -252,7 +252,7 @@ const state = Topologica({
 You can use reactive functions to trigger code with side effects like DOM manipulation.
 
 ```js
-const state = Topologica({
+const dataflow = Topologica({
   fullName: λ(
     ({firstName, lastName}) => `${firstName} ${lastName}`,
     'firstName, lastName'
@@ -272,19 +272,19 @@ Here's the tricky case, where breadth-first or time-tick-based propagation fails
 </p>
 
 ```js
-const state = Topologica({
+const dataflow = Topologica({
   b: λ(({a}) => a + 1, 'a'),
   c: λ(({b}) => b + 1, 'b'),
   d: λ(({a}) => a + 1, 'a'),
   e: λ(({b, d}) => b + d, 'b, d')
 });
-state.set({ a: 5 });
+dataflow.set({ a: 5 });
 const a = 5;
 const b = a + 1;
 const c = b + 1;
 const d = a + 1;
 const e = b + d;
-assert.equal(state.get().e, e);
+assert.equal(dataflow.get().e, e);
 ```
 
 For more examples, have a look at the [tests](/test/test.js).
