@@ -6,13 +6,13 @@ export default options => {
   const edges = {};
   const adjacent = node => edges[node] || [];
 
+  // 888
   const addNode = node => {
     edges[node] = adjacent(node);
   };
 
   const addEdge = (u, v) => {
     addNode(u);
-    addNode(v);
     adjacent(u).push(v);
   };
 
