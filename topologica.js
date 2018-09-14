@@ -1,7 +1,7 @@
 const keys = Object.keys;
 
 export default options => {
-  const values = {};
+  const state = {};
   const functions = {};
   const edges = {};
   const adjacent = node => edges[node] || [];
@@ -43,8 +43,8 @@ export default options => {
 
   const set = function(options) {
     depthFirstSearch(keys(options).map(property => {
-      if (values[property] !== options[property]) {
-        values[property] = options[property];
+      if (state[property] !== options[property]) {
+        state[property] = options[property];
         return property;
       }
     }))
@@ -56,8 +56,8 @@ export default options => {
   const allDefined = dependencies => {
     const arg = {};
     return dependencies.every(property => {
-      if (values[property] !== undefined){
-        arg[property] = values[property];
+      if (state[property] !== undefined){
+        arg[property] = state[property];
         return true;
       }
     }) ? arg : null;
@@ -80,13 +80,13 @@ export default options => {
     functions[property] = () => {
       const arg = allDefined(dependencies);
       if (arg) {
-        values[property] = fn(arg);
+        state[property] = fn(arg);
       }
     };
   });
 
   return {
     set,
-    get: () => values
+    get: () => state
   };
 };
