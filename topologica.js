@@ -6,15 +6,9 @@ export default options => {
   const edges = {};
   const adjacent = node => edges[node] || [];
 
-  // 888
-  const addNode = node => {
+  // 881
+  const addNode = node =>
     edges[node] = adjacent(node);
-  };
-
-  const addEdge = (u, v) => {
-    addNode(u);
-    adjacent(u).push(v);
-  };
 
   const depthFirstSearch = sourceNodes => {
     const visited = {};
@@ -74,7 +68,7 @@ export default options => {
       : dependencies;
 
     dependencies.forEach(input => {
-      addEdge(input, property);
+      addNode(input).push(property);
     });
 
     functions[property] = () => {
