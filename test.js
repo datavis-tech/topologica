@@ -1,4 +1,4 @@
-const Topologica = require('../dist/topologica.js');
+const Topologica = require('./dist/topologica.js');
 const assert = require('assert');
 
 const λ = (fn, dependencies) => {
