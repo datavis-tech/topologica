@@ -173,16 +173,16 @@ Here's an example that uses an asynchronous function. There is no specific funct
 
 ```javascript
 const dataflow = Topologica({
-  bPromise: λ(
+  bPromise: [
     ({a}) => Promise.resolve(a + 5).then(b => dataflow.set({ b })),
     'a'
-  ),
-  c: λ(
+  ],
+  c: [
     ({b}) => {
       console.log(b); // Prints 10
     },
     'b'
-  )
+  ]
 });
 dataflow.set({ a: 5 });
 ```
@@ -222,30 +222,14 @@ assert.equal(dataflow.get().fullName, 'Wilma Flintstone');
   Full name changes whenever its dependencies change.
 </p>
 
-Note that `dependencies` can be passed in as either:
-
- * an array of strings (e.g. `['firstName', 'lastName']`), or
- * a comma delimited string (e.g. `firstName, lastName`).
-
-For the rest of the examples here, we'll make use of the following convenience function for constructing reactive functions using a single statement:
-
-```js
-const λ = (fn, dependencies) => {
-  fn.dependencies = dependencies;
-  return fn;
-};
-```
-
-While this convenience function is useful for the examples here in this README, it is not part of the library itself. This is to keep the library minimal. If you think this function should be part of the library, please open a new issue.
-
-Here's the previous example re-written to use this convenience function.
+Here's the previous example re-written to specify the reactive function using a two element array with dependencies specified as a comma delimited string. This is the form we'll use for the rest of the examples here.
 
 ```js
 const dataflow = Topologica({
-  fullName: λ(
+  fullName: [
     ({firstName, lastName}) => `${firstName} ${lastName}`,
     'firstName, lastName'
-  )
+  ]
 });
 ```
 
@@ -253,14 +237,14 @@ You can use reactive functions to trigger code with side effects like DOM manipu
 
 ```js
 const dataflow = Topologica({
-  fullName: λ(
+  fullName: [
     ({firstName, lastName}) => `${firstName} ${lastName}`,
     'firstName, lastName'
-  )
-  fullNameText: λ(
+  ]
+  fullNameText: [
     ({fullName}) => d3.select('#full-name').text(fullName),
     'fullName'
-  )
+  ]
 });
 assert.equal(d3.select('#full-name').text(), 'Fred Flintstone');
 ```
@@ -273,10 +257,10 @@ Here's the tricky case, where breadth-first or time-tick-based propagation fails
 
 ```js
 const dataflow = Topologica({
-  b: λ(({a}) => a + 1, 'a'),
-  c: λ(({b}) => b + 1, 'b'),
-  d: λ(({a}) => a + 1, 'a'),
-  e: λ(({b, d}) => b + d, 'b, d')
+  b: [({a}) => a + 1, 'a'],
+  c: [({b}) => b + 1, 'b'],
+  d: [({a}) => a + 1, 'a'],
+  e: [({b, d}) => b + d, 'b, d']
 });
 dataflow.set({ a: 5 });
 const a = 5;

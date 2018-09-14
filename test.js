@@ -1,11 +1,6 @@
 const Topologica = require('./dist/topologica.js');
 const assert = require('assert');
 
-const λ = (fn, dependencies) => {
-  fn.dependencies = dependencies;
-  return fn;
-};
-
 describe('Topologica.js', () => {
 
   it('Should set and get a value.', () => {
@@ -23,7 +18,7 @@ describe('Topologica.js', () => {
 
   it('Should compute a derived property.', () => {
     const dataflow = Topologica({
-      b: λ(({a}) => a + 1, 'a')
+      b: [({a}) => a + 1, 'a']
     });
     dataflow.set({
       a: 5
@@ -33,14 +28,14 @@ describe('Topologica.js', () => {
 
   it('Should handle uninitialized property.', () => {
     const dataflow = Topologica({
-      b: λ(({a}) => a + 1, 'a')
+      b: [({a}) => a + 1, 'a']
     });
     assert.equal(dataflow.get().b, undefined);
   });
 
   it('Should propagate changes synchronously.', () => {
     const dataflow = Topologica({
-      b: λ(({a}) => a + 1, 'a')
+      b: [({a}) => a + 1, 'a']
     });
 
     dataflow.set({
@@ -56,8 +51,8 @@ describe('Topologica.js', () => {
 
   it('Should compute a derived property with 2 hops.', () => {
     const dataflow = Topologica({
-      b: λ(({a}) => a + 1, 'a'),
-      c: λ(({b}) => b + 1, 'b')
+      b: [({a}) => a + 1, 'a'],
+      c: [({b}) => b + 1, 'b']
     });
     dataflow.set({
       a: 5
@@ -67,10 +62,10 @@ describe('Topologica.js', () => {
 
   it('Should handle case of 2 inputs.', () => {
     const dataflow = Topologica({
-      fullName: λ(
+      fullName: [
         ({firstName, lastName}) => `${firstName} ${lastName}`,
         'firstName, lastName'
-      )
+      ]
     });
     dataflow.set({
       firstName: 'Fred',
@@ -129,10 +124,10 @@ describe('Topologica.js', () => {
 
   it('Should only execute when all inputs are defined.', () => {
     const dataflow = Topologica({
-      fullName: λ(
+      fullName: [
         ({firstName, lastName}) => `${firstName} ${lastName}`,
         'firstName, lastName'
-      )
+      ]
     });
 
     dataflow.set({
@@ -148,7 +143,7 @@ describe('Topologica.js', () => {
 
   it('Should handle case of 3 inputs.', () => {
     const dataflow = Topologica({
-      d: λ(({a, b, c}) => a + b + c, 'a,b,c')
+      d: [({a, b, c}) => a + b + c, 'a,b,c']
     });
     dataflow.set({
       a: 5,
@@ -160,7 +155,7 @@ describe('Topologica.js', () => {
 
   it('Should handle spaces in input string.', () => {
     const dataflow = Topologica({
-      d: λ(({a, b, c}) => a + b + c, '  a ,    b, c   ')
+      d: [({a, b, c}) => a + b + c, '  a ,    b, c   ']
     });
     dataflow.set({
       a: 5,
@@ -180,9 +175,9 @@ describe('Topologica.js', () => {
   //
   it('Should evaluate not-too-tricky case.', () => {
     const dataflow = Topologica({
-      b: λ(({a}) => a + 1, 'a'),
-      d: λ(({c}) => c + 1, 'c'),
-      e: λ(({b, d}) => b + d, 'b, d')
+      b: [({a}) => a + 1, 'a'],
+      d: [({c}) => c + 1, 'c'],
+      e: [({b, d}) => b + d, 'b, d']
     });
     dataflow.set({
       a: 1,
@@ -200,10 +195,10 @@ describe('Topologica.js', () => {
   //      e   
   it('Should evaluate tricky case.', () => {
     const dataflow = Topologica({
-      b: λ(({a}) => a + 1, 'a'),
-      c: λ(({b}) => b + 1, 'b'),
-      d: λ(({a}) => a + 1, 'a'),
-      e: λ(({b, d}) => b + d, 'b, d')
+      b: [({a}) => a + 1, 'a'],
+      c: [({b}) => b + 1, 'b'],
+      d: [({a}) => a + 1, 'a'],
+      e: [({b, d}) => b + d, 'b, d']
     });
     dataflow.set({
       a: 5
@@ -228,13 +223,13 @@ describe('Topologica.js', () => {
   //       h   
   it('Should evaluate trickier case.', () => {
     const dataflow = Topologica({
-      b: λ(({a}) => a + 1, 'a'),
-      c: λ(({b}) => b + 1, 'b'),
-      d: λ(({c}) => c + 1, 'c'),
-      e: λ(({a}) => a + 1, 'a'),
-      f: λ(({e}) => e + 1, 'e'),
-      g: λ(({a}) => a + 1, 'a'),
-      h: λ(({d, f, g}) => d + f + g, 'd, f, g')
+      b: [({a}) => a + 1, 'a'],
+      c: [({b}) => b + 1, 'b'],
+      d: [({c}) => c + 1, 'c'],
+      e: [({a}) => a + 1, 'a'],
+      f: [({e}) => e + 1, 'e'],
+      g: [({a}) => a + 1, 'a'],
+      h: [({d, f, g}) => d + f + g, 'd, f, g']
     });
     dataflow.set({
       a: 5
@@ -252,7 +247,7 @@ describe('Topologica.js', () => {
 
   it('Should work with booleans.', () => {
     const dataflow = Topologica({
-      b: λ(({a}) => !a, 'a')
+      b: [({a}) => !a, 'a']
     });
     dataflow.set({
       a: false
@@ -262,17 +257,17 @@ describe('Topologica.js', () => {
 
   it('Should work with async functions.', done => {
     const dataflow = Topologica({
-      bPromise: λ(
+      bPromise: [
         ({a}) => Promise.resolve(a + 5).then(b => dataflow.set({ b })),
         'a'
-      ),
-      c: λ(
+      ],
+      c: [
         ({b}) => {
           assert.equal(b, 10);
           done();
         },
         'b'
-      )
+      ]
     });
     dataflow.set({
       a: 5
@@ -283,7 +278,7 @@ describe('Topologica.js', () => {
     let invocations = 0;
 
     const dataflow = Topologica({
-      b: λ(({a}) => invocations++, 'a')
+      b: [({a}) => invocations++, 'a']
     });
 
     assert.equal(invocations, 0);
@@ -302,7 +297,7 @@ describe('Topologica.js', () => {
     let invocations = 0;
 
     const dataflow = Topologica({
-      c: λ(() => invocations++, 'a, b')
+      c: [() => invocations++, 'a, b']
     });
 
     assert.equal(invocations, 0);
@@ -319,10 +314,10 @@ describe('Topologica.js', () => {
 
   it('Should pass only dependencies into reactive functions.', () => {
     const dataflow = Topologica({
-      b: λ(
+      b: [
         props => Object.keys(props),
         'a'
-      )
+      ]
     });
     dataflow.set({
       a: 'Foo',
@@ -333,13 +328,13 @@ describe('Topologica.js', () => {
 
   it('Should be fast.', () => {
     const dataflow = Topologica({
-      b: λ(({a}) => a + 1, 'a'),
-      c: λ(({b}) => b + 1, 'b'),
-      d: λ(({c}) => c + 1, 'c'),
-      e: λ(({a}) => a + 1, 'a'),
-      f: λ(({e}) => e + 1, 'e'),
-      g: λ(({a}) => a + 1, 'a'),
-      h: λ(({d, f, g}) => d + f + g, 'd, f, g')
+      b: [({a}) => a + 1, 'a'],
+      c: [({b}) => b + 1, 'b'],
+      d: [({c}) => c + 1, 'c'],
+      e: [({a}) => a + 1, 'a'],
+      f: [({e}) => e + 1, 'e'],
+      g: [({a}) => a + 1, 'a'],
+      h: [({d, f, g}) => d + f + g, 'd, f, g']
     });
     const numRuns = 10;
     let totalTime = 0;
