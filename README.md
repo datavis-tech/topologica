@@ -92,7 +92,7 @@ This table shows all 4 ways of defining a reactive function, each of which may b
 
 <a name="set" href="#set">#</a> <i>dataflow</i>.<b>set</b>(<i>stateChange</i>)
 
-Performs a shallow merge of `stateChange` into the current state, and propages the change through the data flow graph (synchronously) using topological sort. You can use this to set the values for properties that reactive functions depend on.
+Performs a shallow merge of `stateChange` into the current state, and propages the change through the data flow graph (synchronously) using topological sort. You can use this to set the values for properties that reactive functions depend on. If a property is not included in `stateChange`, it retains its previous value.
 
 ```js
 dataflow.set({
@@ -103,7 +103,13 @@ dataflow.set({
 
 The above example sets two properties at once, `firstName` and `lastName`. When this is invoked, all dependencies of `fullName` are defined, so `fullName` is synchronously computed.
 
+<a name="get" href="#get">#</a> <i>dataflow</i>.<b>get</b>()
+Gets the current state of all properties, including derived properties.
 
+```js
+const state = dataflow.get();
+console.log(state.fullName); // Prints 'Fred Flintstone'
+```
 
 ## Usage Examples
 
