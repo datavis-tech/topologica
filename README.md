@@ -103,7 +103,9 @@ dataflow.set({
 
 The above example sets two properties at once, `firstName` and `lastName`. When this is invoked, all dependencies of `fullName` are defined, so `fullName` is synchronously computed.
 
-If a property in `stateChange` is equal to its previous value using strict equality (`===`), it is not considered changed, and reactive functions that depend on it will _not_ be invoked. You should therefore use only [immutable update patterns](https://redux.js.org/recipes/structuringreducers/immutableupdatepatterns) when changing objects and arrays.
+If a property in `stateChange` is equal to its previous value using strict equality (`===`), it is _not_ considered changed, and reactive functions that depend on it will _not_ be invoked. You should therefore use only [immutable update patterns](https://redux.js.org/recipes/structuringreducers/immutableupdatepatterns) when changing objects and arrays.
+
+If a property in `stateChange` is not equal to its previous value using strict equality (`===`), it _is_ considered changed, and reactive functions that depend on it _will_ be invoked. This can be problematic if you're passing in callback functions and defining them inline in each invocation. For this case, consider defining the callbacks once, and passing in the same reference on each invocation ([example](https://vizhub.com/curran/27c261085d8a48618c69f7983672903b)), so that the strict equality check will succeed.
 
 <a name="get" href="#get">#</a> <i>dataflow</i>.<b>get</b>()
 Gets the current state of all properties, including derived properties.
