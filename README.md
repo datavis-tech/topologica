@@ -122,7 +122,8 @@ Assigning values directly to the returned `state` object (for example `state.fir
 External running examples:
 
  * [Hello Topologica.js!](https://vizhub.com/curran/607a261492e24c308707c3ae413b3981) - Pick a color with 3 sliders.
- * [Bowl of Fruit - Topologica Experiment](https://vizhub.com/curran/27c261085d8a48618c69f7983672903b) - A proposed approach for using Topologica for local state of D3-based components.
+ * [Bowl of Fruit - Topologica Experiment](https://vizhub.com/curran/27c261085d8a48618c69f7983672903b) - A proposed approach for using Topologica with D3.
+ * [Topologica Layers Experiment](https://vizhub.com/curran/f26d83673fca4d17a7579f3fdba400d6) - Experiment with interactive highlighting.
 
 You can define _reactive functions_ that compute properties that depend on other properties as input. These properties exist on instances of `Topologica`, so in a sense they are namespaced rather than free-floating. For example, consider the following example where `b` gets set to `a + 1` whenever `a` changes.
 
