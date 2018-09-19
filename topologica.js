@@ -1,70 +1,26 @@
 const keys = Object.keys;
 
-export default options => {
-  const values = {};
+export default reactiveFunctions => {
+  const state = {};
   const functions = {};
   const edges = {};
-  const adjacent = node => edges[node] || [];
-
-  const addNode = node => {
-    edges[node] = adjacent(node);
-  };
-
-  const addEdge = (u, v) => {
-    addNode(u);
-    addNode(v);
-    adjacent(u).push(v);
-  };
-
-  const depthFirstSearch = sourceNodes => {
-    const visited = {};
-    const nodeList = [];
-
-    const DFSVisit = node => {
-      if (!visited[node]) {
-        visit(node);
-        nodeList.push(node);
-      }
-    };
-
-    const visit = node => {
-      visited[node] = true;
-      adjacent(node).forEach(DFSVisit);
-    }
-
-    sourceNodes.forEach(visit);
-
-    return nodeList;
-  }
 
   const invoke = property => {
     functions[property]();
   };
 
-  const set = function(options) {
-    depthFirstSearch(keys(options).map(property => {
-      if (values[property] !== options[property]) {
-        values[property] = options[property];
-        return property;
-      }
-    }))
-      .reverse()
-      .forEach(invoke);
-    return this;
-  };
-
   const allDefined = dependencies => {
     const arg = {};
     return dependencies.every(property => {
-      if (values[property] !== undefined){
-        arg[property] = values[property];
+      if (state[property] !== undefined){
+        arg[property] = state[property];
         return true;
       }
     }) ? arg : null;
   };
 
-  keys(options).forEach(property => {
-    const reactiveFunction = options[property];
+  keys(reactiveFunctions).forEach(property => {
+    const reactiveFunction = reactiveFunctions[property];
     let dependencies = reactiveFunction.dependencies;
     const fn = dependencies ? reactiveFunction : reactiveFunction[0];
     dependencies = dependencies || reactiveFunction[1];
@@ -74,19 +30,52 @@ export default options => {
       : dependencies;
 
     dependencies.forEach(input => {
-      addEdge(input, property);
+      (edges[input] = edges[input] || []).push(property);
     });
 
     functions[property] = () => {
       const arg = allDefined(dependencies);
       if (arg) {
-        values[property] = fn(arg);
+        state[property] = fn(arg);
       }
     };
   });
 
+  const depthFirstSearch = sourceNodes => {
+    const visited = {};
+    const nodeList = [];
+
+    const search = node => {
+      if (!visited[node]) {
+        visit(node);
+        nodeList.push(node);
+      }
+    };
+
+    const visit = node => {
+      visited[node] = true;
+      edges[node] && edges[node].forEach(search);
+    }
+
+    sourceNodes.forEach(visit);
+
+    return nodeList;
+  }
+
+  const set = function(stateChange) {
+    depthFirstSearch(keys(stateChange).map(property => {
+      if (state[property] !== stateChange[property]) {
+        state[property] = stateChange[property];
+        return property;
+      }
+    }))
+      .reverse()
+      .forEach(invoke);
+    return this;
+  };
+
   return {
     set,
-    get: () => values
+    get: () => state
   };
 };
