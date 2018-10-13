@@ -1,4 +1,4 @@
-# Topologica.js
+# topologica.js
 A library for [reactive programming](https://en.wikipedia.org/wiki/Reactive_programming). Weighs [1KB minified](https://unpkg.com/topologica).
 
 This library provides an abstraction for **reactive data flows**. This means you can declaratively specify a [dependency graph](https://en.wikipedia.org/wiki/Dependency_graph), and the library will take care of executing _only_ the required functions to propagate changes through the graph in the correct order. Nodes in the dependency graph are named properties, and edges are reactive functions that compute derived properties as functions of their inputs (dependencies). The order of execution is determined using the [topological sorting algorithm](https://en.wikipedia.org/wiki/Topological_sorting), hence the name _Topologica_.
@@ -24,7 +24,7 @@ npm install --save-dev topologica
 Then import it into your code like this:
 
 ```js
-import Topologica from 'topologica';
+import topologica from 'topologica';
 ```
 
 You can also include the library in a script tag from Unpkg, like this:
@@ -33,16 +33,16 @@ You can also include the library in a script tag from Unpkg, like this:
 <script src="https://unpkg.com/topologica@3.1.0/dist/topologica.min.js"></script>
 ```
 
-This script tag introduces the global `Topologica`.
+This script tag introduces the global `topologica`.
 
 ## API Reference
 
-<a name="constructor" href="#constructor">#</a> <b>Topologica</b>(<i>reactiveFunctions</i>)
+<a name="constructor" href="#constructor">#</a> <b>topologica</b>(<i>reactiveFunctions</i>)
 
-Constructs a new data flow graph with the given <i>reactiveFunctions</i> argument, an object whose keys are the names of computed properties and whose values are reactive functions. By convention, the variable name `dataflow` is used for instances of Topologica, because they are reactive data flow graphs.
+Constructs a new data flow graph with the given <i>reactiveFunctions</i> argument, an object whose keys are the names of computed properties and whose values are reactive functions. By convention, the variable name `dataflow` is used for instances of `topologica`, because they are reactive data flow graphs.
 
 ```js
-const dataflow = Topologica({ fullName });
+const dataflow = topologica({ fullName });
 ```
 
 A reactive function accepts a single argument, an object containing values for its inputs, and has an explicit representation of its inputs. A reactive function can either be represented as a **function** with an _inputs_ property, or as an **array** where the first element is the function and the second element is the inputs. Dependencies can be represented either as an array of property name strings, or as a comma delimited string of property names.
@@ -88,7 +88,7 @@ fullName.inputs =
 This table shows all 4 ways of defining a reactive function, each of which may be useful in different contexts.
 
  * **inputs** If you are typing the inputs by hand, it makes sense to use the comma-delimited string variant, so that you can easily copy-paste between it and a destructuring assignment (most common case). If you are deriving inputs programmatically, it makes sense to use the array variant instead.
- * **reactive functions** If you want to define a reactive function in a self-contained way, for example as a separate module, it makes sense to use the variant where you specify `.inputs` on a function (most common case). If you want to define multiple smaller reactive functions as a group, for example in the statement that constructs the Topologica instance, then it makes sense to use the more compact two element array variant.
+ * **reactive functions** If you want to define a reactive function in a self-contained way, for example as a separate module, it makes sense to use the variant where you specify `.inputs` on a function (most common case). If you want to define multiple smaller reactive functions as a group, for example in the statement that constructs the `dataflow` instance, then it makes sense to use the more compact two element array variant.
 
 <a name="set" href="#set">#</a> <i>dataflow</i>(<i>stateChange</i>)
 
@@ -124,7 +124,7 @@ External running examples:
  * [Bowl of Fruit - Topologica Experiment](https://vizhub.com/curran/27c261085d8a48618c69f7983672903b) - A proposed approach for using Topologica with D3.
  * [Topologica Layers Experiment](https://vizhub.com/curran/f26d83673fca4d17a7579f3fdba400d6) - Experiment with interactive highlighting.
 
-You can define _reactive functions_ that compute properties that depend on other properties as input. These properties exist on instances of `Topologica`, so in a sense they are namespaced rather than free-floating. For example, consider the following example where `b` gets set to `a + 1` whenever `a` changes.
+You can define _reactive functions_ that compute properties that depend on other properties as input. These properties exist on instances of `topologica`, so in a sense they are namespaced rather than free-floating. For example, consider the following example where `b` gets set to `a + 1` whenever `a` changes.
 
 ```javascript
 // First, define a function that accepts an options object as an argument.
@@ -134,7 +134,7 @@ const b = ({a}) => a + 1;
 b.inputs = ['a'];
 
 // Pass this function into the Topologica constructor.
-const dataflow = Topologica({ b });
+const dataflow = topologica({ b });
 
 // Setting the value of a will synchronously propagate changes to B.
 dataflow({ a: 2 });
@@ -158,11 +158,10 @@ b.inputs = ['a'];
 const c = ({b}) => b + 1;
 c.inputs = ['b'];
 
-const dataflow = Topologica({ b, c })({ a: 5 });
+const dataflow = topologica({ b, c });
+dataflow({ a: 5 });
 assert.equal(dataflow.c, 7);
 ```
-
-Note that `set` returns the `Topologica` instance, so it is chainable.
 
 <p align="center">
   <img src="https://cloud.githubusercontent.com/assets/68416/15385597/44a10522-1dc0-11e6-9054-2150f851db46.png">
@@ -178,7 +177,7 @@ Here's an example that uses an asynchronous function. There is no specific funct
  * Call `dataflow` asynchronously after the promise resolves.
 
 ```javascript
-Topologica({
+topologica({
   bPromise: [
     dataflow => Promise
       .resolve(dataflow.a + 5)
@@ -212,7 +211,7 @@ Here's an example that computes a person's full name from their first name and a
 const fullName = ({firstName, lastName}) => `${firstName} ${lastName}`;
 fullName.inputs = 'firstName, lastName';
 
-const dataflow = Topologica({ fullName });
+const dataflow = topologica({ fullName });
 
 dataflow({ firstName: 'Fred', lastName: 'Flintstone' });
 assert.equal(dataflow.fullName, 'Fred Flintstone');
@@ -234,7 +233,7 @@ assert.equal(dataflow.fullName, 'Wilma Flintstone');
 Here's the previous example re-written to specify the reactive function using a two element array with inputs specified as a comma delimited string. This is the form we'll use for the rest of the examples here.
 
 ```js
-const dataflow = Topologica({
+const dataflow = topologica({
   fullName: [
     ({firstName, lastName}) => `${firstName} ${lastName}`,
     'firstName, lastName'
@@ -245,7 +244,7 @@ const dataflow = Topologica({
 You can use reactive functions to trigger code with side effects like DOM manipulation.
 
 ```js
-const dataflow = Topologica({
+const dataflow = topologica({
   fullName: [
     ({firstName, lastName}) => `${firstName} ${lastName}`,
     'firstName, lastName'
@@ -265,7 +264,7 @@ Here's the tricky case, where breadth-first or time-tick-based propagation fails
 </p>
 
 ```js
-const dataflow = Topologica({
+const dataflow = topologica({
   b: [({a}) => a + 1, 'a'],
   c: [({b}) => b + 1, 'b'],
   d: [({a}) => a + 1, 'a'],
