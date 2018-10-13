@@ -10,7 +10,7 @@ export default reactiveFunctions => {
     }))
       .reverse()
       .forEach(invoke);
-    return this;
+    return dataflow;
   };
 
   const functions = {};
@@ -65,8 +65,5 @@ export default reactiveFunctions => {
     return nodeList;
   }
 
-  return {
-    set: dataflow,
-    get: () => dataflow
-  };
+  return dataflow;
 };

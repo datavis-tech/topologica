@@ -90,12 +90,12 @@ This table shows all 4 ways of defining a reactive function, each of which may b
  * **dependencies** If you are typing the dependencies by hand, it makes sense to use the comma-delimited string variant, so that you can easily copy-paste between it and a destructuring assignment (most common case). If you are deriving dependencies programmatically, it makes sense to use the array variant instead.
  * **reactive functions** If you want to define a reactive function in a self-contained way, for example as a separate module, it makes sense to use the variant where you specify `.dependencies` on a function (most common case). If you want to define multiple smaller reactive functions as a group, for example in the statement that constructs the Topologica instance, then it makes sense to use the more compact two element array variant.
 
-<a name="set" href="#set">#</a> <i>dataflow</i>.<b>set</b>(<i>stateChange</i>)
+<a name="set" href="#set">#</a> <i>dataflow</i>(<i>stateChange</i>)
 
 Performs a shallow merge of `stateChange` into the current state, and propages the change through the data flow graph (synchronously) using topological sort. You can use this to set the values for properties that reactive functions depend on. If a property is not included in `stateChange`, it retains its previous value.
 
 ```js
-dataflow.set({
+dataflow({
   firstName: 'Fred',
   lastName: 'Flintstone'
 });
@@ -111,11 +111,10 @@ If a property in `stateChange` is not equal to its previous value using strict e
 Gets the current state of all properties, including derived properties.
 
 ```js
-const state = dataflow.get();
-console.log(state.fullName); // Prints 'Fred Flintstone'
+console.log(dataflow.fullName); // Prints 'Fred Flintstone'
 ```
 
-Assigning values directly to the returned `state` object (for example `state.firstName = 'Wilma'`) will _not_ trigger reactive functions. Use [set](#set) instead.
+Assigning values directly to the `dataflow` object (for example `dataflow.firstName = 'Wilma'`) will _not_ trigger reactive functions. Use [dataflow as a function](#set) instead.
 
 ## Usage Examples
 
@@ -138,10 +137,10 @@ b.dependencies = ['a'];
 const dataflow = Topologica({ b });
 
 // Setting the value of a will synchronously propagate changes to B.
-dataflow.set({ a: 2 });
+dataflow({ a: 2 });
 
-// You can use dataflow.get to retreive computed values.
-assert.equal(dataflow.get().b, 3);
+// You can use dataflow to retreive computed values.
+assert.equal(dataflow.b, 3);
 ```
 
 <p align="center">
@@ -159,8 +158,8 @@ b.dependencies = ['a'];
 const c = ({b}) => b + 1;
 c.dependencies = ['b'];
 
-const dataflow = Topologica({ b, c }).set({ a: 5 });
-assert.equal(dataflow.get().c, 7);
+const dataflow = Topologica({ b, c })({ a: 5 });
+assert.equal(dataflow.c, 7);
 ```
 
 Note that `set` returns the `Topologica` instance, so it is chainable.
@@ -176,7 +175,7 @@ Note that `set` returns the `Topologica` instance, so it is chainable.
 Here's an example that uses an asynchronous function. There is no specific functionality in the library for supporting asynchronous functions differently, but this is a recommended pattern for working with them:
 
  * Use a property for the promise itself, where nothing depends on this property.
- * Call `.set` asynchronously after the promise resolves.
+ * Call `dataflow` asynchronously after the promise resolves.
 
 ```javascript
 Topologica({
@@ -192,8 +191,10 @@ Topologica({
     },
     'b'
   ]
-}).set({ a: 5 });
+})({ a: 5 });
 ```
+
+Note that `dataflow` is passed into reactive functions, so you can invoke it asynchronously if required (without the need to assign the Topologica instance to a variable in scope).
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/68416/41818527-7e41eba6-77ce-11e8-898a-9f85de1563ed.png">
@@ -213,15 +214,15 @@ fullName.dependencies = 'firstName, lastName';
 
 const dataflow = Topologica({ fullName });
 
-dataflow.set({ firstName: 'Fred', lastName: 'Flintstone' });
-assert.equal(dataflow.get().fullName, 'Fred Flintstone');
+dataflow({ firstName: 'Fred', lastName: 'Flintstone' });
+assert.equal(dataflow.fullName, 'Fred Flintstone');
 ```
 
 Now if either firstName or `lastName` changes, `fullName` will be updated (synchronously).
 
 ```js
-dataflow.set({ firstName: 'Wilma' });
-assert.equal(dataflow.get().fullName, 'Wilma Flintstone');
+dataflow({ firstName: 'Wilma' });
+assert.equal(dataflow.fullName, 'Wilma Flintstone');
 ```
 
 <p align="center">
@@ -270,13 +271,13 @@ const dataflow = Topologica({
   d: [({a}) => a + 1, 'a'],
   e: [({b, d}) => b + d, 'b, d']
 });
-dataflow.set({ a: 5 });
+dataflow({ a: 5 });
 const a = 5;
 const b = a + 1;
 const c = b + 1;
 const d = a + 1;
 const e = b + d;
-assert.equal(dataflow.get().e, e);
+assert.equal(dataflow.e, e);
 ```
 
 For more examples, have a look at the [tests](/test/test.js).
