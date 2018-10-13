@@ -20,25 +20,25 @@ export default reactiveFunctions => {
     functions[property]();
   };
 
-  const allDefined = dependencies => dependencies
+  const allDefined = inputs => inputs
     .every(property => dataflow[property] !== undefined);
 
   keys(reactiveFunctions).forEach(property => {
     const reactiveFunction = reactiveFunctions[property];
-    let dependencies = reactiveFunction.dependencies;
-    const fn = dependencies ? reactiveFunction : reactiveFunction[0];
-    dependencies = dependencies || reactiveFunction[1];
+    let inputs = reactiveFunction.inputs;
+    const fn = inputs ? reactiveFunction : reactiveFunction[0];
+    inputs = inputs || reactiveFunction[1];
 
-    dependencies = dependencies.split
-      ? dependencies.split(',').map(str => str.trim())
-      : dependencies;
+    inputs = inputs.split
+      ? inputs.split(',').map(str => str.trim())
+      : inputs;
 
-    dependencies.forEach(input => {
+    inputs.forEach(input => {
       (edges[input] = edges[input] || []).push(property);
     });
 
     functions[property] = () => {
-      if (allDefined(dependencies)) {
+      if (allDefined(inputs)) {
         dataflow[property] = fn(dataflow);
       }
     };

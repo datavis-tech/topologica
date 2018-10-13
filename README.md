@@ -1,7 +1,7 @@
 # Topologica.js
 A library for [reactive programming](https://en.wikipedia.org/wiki/Reactive_programming). Weighs [1KB minified](https://unpkg.com/topologica).
 
-This library provides an abstraction for **reactive data flows**. This means you can declaratively specify a [dependency graph](https://en.wikipedia.org/wiki/Dependency_graph), and the library will take care of executing _only_ the required functions to propagate changes through the graph in the correct order. Nodes in the dependency graph are named properties, and edges are reactive functions that compute derived properties as functions of their dependencies. The order of execution is determined using the [topological sorting algorithm](https://en.wikipedia.org/wiki/Topological_sorting), hence the name _Topologica_.
+This library provides an abstraction for **reactive data flows**. This means you can declaratively specify a [dependency graph](https://en.wikipedia.org/wiki/Dependency_graph), and the library will take care of executing _only_ the required functions to propagate changes through the graph in the correct order. Nodes in the dependency graph are named properties, and edges are reactive functions that compute derived properties as functions of their inputs (dependencies). The order of execution is determined using the [topological sorting algorithm](https://en.wikipedia.org/wiki/Topological_sorting), hence the name _Topologica_.
 
 Topologica is primarily intended for use in optimizing interactive data visualizations created using [D3.js](https://d3js.org/) and a unidirectional data flow approach. The problem with using unidirectional data flow with interactive data visualizations is that it leads to **unnecessary execution of heavyweight computations over data on every render**. For example, if you change the highlighted element, or the text of an axis label, the entire visualization including scales and rendering of all marks would be recomputed and re-rendered to the DOM unnecessarily. Topologica.js lets you improve performance by only executing heavy computation and rendering operations when they are actually required. It also allows you to simplify your code by splitting it into logical chunks based on reactive functions, and makes it so you don't need to think about order of execution at all.
 
@@ -45,7 +45,7 @@ Constructs a new data flow graph with the given <i>reactiveFunctions</i> argumen
 const dataflow = Topologica({ fullName });
 ```
 
-A reactive function accepts a single argument, an object containing values for its dependencies, and has an explicit representation of its dependencies. A reactive function can either be represented as a **function** with a _dependencies_ property, or as an **array** where the first element is the function and the second element is the dependencies. Dependencies can be represented either as an array of property name strings, or as a comma delimited string of property names.
+A reactive function accepts a single argument, an object containing values for its inputs, and has an explicit representation of its inputs. A reactive function can either be represented as a **function** with an _inputs_ property, or as an **array** where the first element is the function and the second element is the inputs. Dependencies can be represented either as an array of property name strings, or as a comma delimited string of property names.
 
 <table>
   <thead>
@@ -61,7 +61,7 @@ A reactive function accepts a single argument, an object containing values for i
       <td><pre lang="js">const fullName =
   ({firstName, lastName}) =>
     ${firstName} ${lastName};
-fullName.dependencies =
+fullName.inputs =
   ['firstName', 'lastName'];</pre></td>
       <td><pre lang="js">const fullName = [
   ({firstName, lastName}) =>
@@ -74,7 +74,7 @@ fullName.dependencies =
       <td><pre lang="js">const fullName =
   ({firstName, lastName}) =>
     ${firstName} ${lastName};
-fullName.dependencies =
+fullName.inputs =
   'firstName, lastName';</pre></td>
       <td><pre lang="js">const fullName = [
   ({firstName, lastName}) =>
@@ -87,8 +87,8 @@ fullName.dependencies =
 
 This table shows all 4 ways of defining a reactive function, each of which may be useful in different contexts.
 
- * **dependencies** If you are typing the dependencies by hand, it makes sense to use the comma-delimited string variant, so that you can easily copy-paste between it and a destructuring assignment (most common case). If you are deriving dependencies programmatically, it makes sense to use the array variant instead.
- * **reactive functions** If you want to define a reactive function in a self-contained way, for example as a separate module, it makes sense to use the variant where you specify `.dependencies` on a function (most common case). If you want to define multiple smaller reactive functions as a group, for example in the statement that constructs the Topologica instance, then it makes sense to use the more compact two element array variant.
+ * **inputs** If you are typing the inputs by hand, it makes sense to use the comma-delimited string variant, so that you can easily copy-paste between it and a destructuring assignment (most common case). If you are deriving inputs programmatically, it makes sense to use the array variant instead.
+ * **reactive functions** If you want to define a reactive function in a self-contained way, for example as a separate module, it makes sense to use the variant where you specify `.inputs` on a function (most common case). If you want to define multiple smaller reactive functions as a group, for example in the statement that constructs the Topologica instance, then it makes sense to use the more compact two element array variant.
 
 <a name="set" href="#set">#</a> <i>dataflow</i>(<i>stateChange</i>)
 
@@ -101,7 +101,7 @@ dataflow({
 });
 ```
 
-The above example sets two properties at once, `firstName` and `lastName`. When this is invoked, all dependencies of `fullName` are defined, so `fullName` is synchronously computed.
+The above example sets two properties at once, `firstName` and `lastName`. When this is invoked, all inputs of `fullName` are defined, so `fullName` is synchronously computed.
 
 If a property in `stateChange` is equal to its previous value using strict equality (`===`), it is _not_ considered changed, and reactive functions that depend on it will _not_ be invoked. You should therefore use only [immutable update patterns](https://redux.js.org/recipes/structuringreducers/immutableupdatepatterns) when changing objects and arrays.
 
@@ -130,8 +130,8 @@ You can define _reactive functions_ that compute properties that depend on other
 // First, define a function that accepts an options object as an argument.
 const b = ({a}) => a + 1;
 
-// Next, declare the dependencies of this function as an array of names.
-b.dependencies = ['a'];
+// Next, declare the inputs of this function as an array of names.
+b.inputs = ['a'];
 
 // Pass this function into the Topologica constructor.
 const dataflow = Topologica({ b });
@@ -153,10 +153,10 @@ Here's an example that assigns `b = a + 1` and `c = b + 1`.
 
 ```javascript
 const b = ({a}) => a + 1
-b.dependencies = ['a'];
+b.inputs = ['a'];
 
 const c = ({b}) => b + 1;
-c.dependencies = ['b'];
+c.inputs = ['b'];
 
 const dataflow = Topologica({ b, c })({ a: 5 });
 assert.equal(dataflow.c, 7);
@@ -210,7 +210,7 @@ Here's an example that computes a person's full name from their first name and a
 
 ```js
 const fullName = ({firstName, lastName}) => `${firstName} ${lastName}`;
-fullName.dependencies = 'firstName, lastName';
+fullName.inputs = 'firstName, lastName';
 
 const dataflow = Topologica({ fullName });
 
@@ -228,10 +228,10 @@ assert.equal(dataflow.fullName, 'Wilma Flintstone');
 <p align="center">
   <img src="https://cloud.githubusercontent.com/assets/68416/15389922/cf3f24dc-1dd6-11e6-92d6-058051b752ea.png">
   <br>
-  Full name changes whenever its dependencies change.
+  Full name changes whenever its inputs change.
 </p>
 
-Here's the previous example re-written to specify the reactive function using a two element array with dependencies specified as a comma delimited string. This is the form we'll use for the rest of the examples here.
+Here's the previous example re-written to specify the reactive function using a two element array with inputs specified as a comma delimited string. This is the form we'll use for the rest of the examples here.
 
 ```js
 const dataflow = Topologica({
@@ -294,10 +294,11 @@ The minimalism and synchronous execution are inspired by similar features in [Ob
 
 Similar initiatives:
 
+ * [Observable Notebook Runtime](https://github.com/observablehq/notebook-runtime#variable_define) Implements a reactive runtime environment with named variables that update when their inputs change.
  * [Mobx](https://github.com/mobxjs/mobx) Very similar library, with React bindings and more API surface area.
  * [DVL](https://github.com/vogievetsky/DVL) Early work on reactive data visualizations.
  * [ZJONSSON/clues](https://github.com/ZJONSSON/clues) A very similar library based on Promises.
- * [Ember Computed Properties](https://guides.emberjs.com/v2.18.0/object-model/computed-properties/) Similar structure of dependencies and reactivity.
+ * [Ember Computed Properties](https://guides.emberjs.com/v2.18.0/object-model/computed-properties/) Similar structure of inputs and reactivity.
  * [AngularJS Dependency Injection](https://docs.angularjs.org/guide/di) Inspired the API for reactive functions.
  * [AngularJS $digest()](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$digest) Inspired the "digest" term.
  * [RxJS](https://github.com/Reactive-Extensions/RxJS) and [Bacon](https://baconjs.github.io/) Full blown FRP packages.

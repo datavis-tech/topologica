@@ -74,9 +74,9 @@ describe('Topologica.js', () => {
     assert.equal(dataflow.fullName, 'Fred Flintstone');
   });
 
-  it('Should accept an array of strings as dependencies.', () => {
+  it('Should accept an array of strings as inputs.', () => {
     const fullName = ({firstName, lastName}) => `${firstName} ${lastName}`;
-    fullName.dependencies = ['firstName', 'lastName'];
+    fullName.inputs = ['firstName', 'lastName'];
     const dataflow = Topologica({ fullName });
     dataflow({
       firstName: 'Fred',
@@ -85,9 +85,9 @@ describe('Topologica.js', () => {
     assert.equal(dataflow.fullName, 'Fred Flintstone');
   });
 
-  it('Should accept a comma delimited string as dependencies.', () => {
+  it('Should accept a comma delimited string as inputs.', () => {
     const fullName = ({firstName, lastName}) => `${firstName} ${lastName}`;
-    fullName.dependencies = 'firstName, lastName';
+    fullName.inputs = 'firstName, lastName';
     const dataflow = Topologica({ fullName });
     dataflow({
       firstName: 'Fred',
@@ -109,7 +109,7 @@ describe('Topologica.js', () => {
     assert.equal(dataflow.fullName, 'Fred Flintstone');
   });
 
-  it('Should accept reactive function as an array, with dependencies as a string.', () => {
+  it('Should accept reactive function as an array, with inputs as a string.', () => {
     const fullName = [
       ({firstName, lastName}) => `${firstName} ${lastName}`,
       'firstName,lastName'
