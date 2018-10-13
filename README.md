@@ -179,9 +179,11 @@ Here's an example that uses an asynchronous function. There is no specific funct
  * Call `.set` asynchronously after the promise resolves.
 
 ```javascript
-const dataflow = Topologica({
+Topologica({
   bPromise: [
-    ({a}) => Promise.resolve(a + 5).then(b => dataflow.set({ b })),
+    dataflow => Promise
+      .resolve(dataflow.a + 5)
+      .then(b => dataflow({ b })),
     'a'
   ],
   c: [
@@ -190,8 +192,7 @@ const dataflow = Topologica({
     },
     'b'
   ]
-});
-dataflow.set({ a: 5 });
+}).set({ a: 5 });
 ```
 
 <p align="center">

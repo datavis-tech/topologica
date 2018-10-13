@@ -20,15 +20,8 @@ export default reactiveFunctions => {
     functions[property]();
   };
 
-  const allDefined = dependencies => {
-    const arg = {};
-    return dependencies.every(property => {
-      if (dataflow[property] !== undefined){
-        arg[property] = dataflow[property];
-        return true;
-      }
-    }) ? arg : null;
-  };
+  const allDefined = dependencies => dependencies
+    .every(property => dataflow[property] !== undefined);
 
   keys(reactiveFunctions).forEach(property => {
     const reactiveFunction = reactiveFunctions[property];
@@ -45,9 +38,8 @@ export default reactiveFunctions => {
     });
 
     functions[property] = () => {
-      const arg = allDefined(dependencies);
-      if (arg) {
-        dataflow[property] = fn(arg);
+      if (allDefined(dependencies)) {
+        dataflow[property] = fn(dataflow);
       }
     };
   });

@@ -274,6 +274,23 @@ describe('Topologica.js', () => {
     });
   });
 
+  it('Should work with async functions.', done => {
+    Topologica({
+      bPromise: [
+        dataflow => Promise.resolve(dataflow.a + 5)
+          .then(b => dataflow({ b })),
+        'a'
+      ],
+      c: [
+        ({b}) => {
+          assert.equal(b, 10);
+          done();
+        },
+        'b'
+      ]
+    }).set({ a: 5 });
+  });
+
   it('Should only propagate changes when values change.', () => {
     let invocations = 0;
 
@@ -310,20 +327,6 @@ describe('Topologica.js', () => {
 
     dataflow.set({ a: 2, b: 6 });
     assert.equal(invocations, 2);
-  });
-
-  it('Should pass only dependencies into reactive functions.', () => {
-    const dataflow = Topologica({
-      b: [
-        props => Object.keys(props),
-        'a'
-      ]
-    });
-    dataflow.set({
-      a: 'Foo',
-      foo: 'Bar'
-    });
-    assert.deepEqual(dataflow.get().b, ['a']);
   });
 
   it('Should be fast.', () => {
