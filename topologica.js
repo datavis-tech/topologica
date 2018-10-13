@@ -1,7 +1,18 @@
 const keys = Object.keys;
 
 export default reactiveFunctions => {
-  const state = {};
+  const dataflow = function(stateChange) {
+    depthFirstSearch(keys(stateChange).map(property => {
+      if (dataflow[property] !== stateChange[property]) {
+        dataflow[property] = stateChange[property];
+        return property;
+      }
+    }))
+      .reverse()
+      .forEach(invoke);
+    return this;
+  };
+
   const functions = {};
   const edges = {};
 
@@ -12,8 +23,8 @@ export default reactiveFunctions => {
   const allDefined = dependencies => {
     const arg = {};
     return dependencies.every(property => {
-      if (state[property] !== undefined){
-        arg[property] = state[property];
+      if (dataflow[property] !== undefined){
+        arg[property] = dataflow[property];
         return true;
       }
     }) ? arg : null;
@@ -36,7 +47,7 @@ export default reactiveFunctions => {
     functions[property] = () => {
       const arg = allDefined(dependencies);
       if (arg) {
-        state[property] = fn(arg);
+        dataflow[property] = fn(arg);
       }
     };
   });
@@ -62,20 +73,8 @@ export default reactiveFunctions => {
     return nodeList;
   }
 
-  const set = function(stateChange) {
-    depthFirstSearch(keys(stateChange).map(property => {
-      if (state[property] !== stateChange[property]) {
-        state[property] = stateChange[property];
-        return property;
-      }
-    }))
-      .reverse()
-      .forEach(invoke);
-    return this;
-  };
-
   return {
-    set,
-    get: () => state
+    set: dataflow,
+    get: () => dataflow
   };
 };
