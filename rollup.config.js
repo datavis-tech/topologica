@@ -4,7 +4,7 @@ export default {
   input: 'topologica.js',
   output: {
     format: 'umd',
-    name: 'topologica',
+    name: 'Topologica',
     file: 'dist/topologica.js'
   },
   plugins: [

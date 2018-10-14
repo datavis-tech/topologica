@@ -1,99 +1,99 @@
-const topologica = require('./dist/topologica.js');
+const Topologica = require('./dist/topologica.js');
 const assert = require('assert');
 
-describe('topologica.js', () => {
+describe('Topologica.js', () => {
 
   it('Should set and get a value.', () => {
-    const dataflow = topologica({});
-    dataflow({
+    const topologica = Topologica({});
+    topologica({
       foo: 'bar'
     });
-    assert.equal(dataflow.foo, 'bar');
+    assert.equal(topologica.foo, 'bar');
   });
 
   it('Should chain set.', () => {
-    const dataflow = topologica({})({ foo: 'bar' });
-    assert.equal(dataflow.foo, 'bar');
+    const topologica = Topologica({})({ foo: 'bar' });
+    assert.equal(topologica.foo, 'bar');
   });
 
   it('Should compute a derived property.', () => {
-    const dataflow = topologica({
+    const topologica = Topologica({
       b: [({a}) => a + 1, 'a']
     });
-    dataflow({
+    topologica({
       a: 5
     });
-    assert.equal(dataflow.b, 6);
+    assert.equal(topologica.b, 6);
   });
 
   it('Should handle uninitialized property.', () => {
-    const dataflow = topologica({
+    const topologica = Topologica({
       b: [({a}) => a + 1, 'a']
     });
-    assert.equal(dataflow.b, undefined);
+    assert.equal(topologica.b, undefined);
   });
 
   it('Should propagate changes synchronously.', () => {
-    const dataflow = topologica({
+    const topologica = Topologica({
       b: [({a}) => a + 1, 'a']
     });
 
-    dataflow({
+    topologica({
       a: 2
     });
-    assert.equal(dataflow.b, 3);
+    assert.equal(topologica.b, 3);
 
-    dataflow({
+    topologica({
       a: 99
     });
-    assert.equal(dataflow.b, 100);
+    assert.equal(topologica.b, 100);
   });
 
   it('Should compute a derived property with 2 hops.', () => {
-    const dataflow = topologica({
+    const topologica = Topologica({
       b: [({a}) => a + 1, 'a'],
       c: [({b}) => b + 1, 'b']
     });
-    dataflow({
+    topologica({
       a: 5
     });
-    assert.equal(dataflow.c, 7);
+    assert.equal(topologica.c, 7);
   });
 
   it('Should handle case of 2 inputs.', () => {
-    const dataflow = topologica({
+    const topologica = Topologica({
       fullName: [
         ({firstName, lastName}) => `${firstName} ${lastName}`,
         'firstName, lastName'
       ]
     });
-    dataflow({
+    topologica({
       firstName: 'Fred',
       lastName: 'Flintstone'
     });
-    assert.equal(dataflow.fullName, 'Fred Flintstone');
+    assert.equal(topologica.fullName, 'Fred Flintstone');
   });
 
   it('Should accept an array of strings as inputs.', () => {
     const fullName = ({firstName, lastName}) => `${firstName} ${lastName}`;
     fullName.inputs = ['firstName', 'lastName'];
-    const dataflow = topologica({ fullName });
-    dataflow({
+    const topologica = Topologica({ fullName });
+    topologica({
       firstName: 'Fred',
       lastName: 'Flintstone'
     });
-    assert.equal(dataflow.fullName, 'Fred Flintstone');
+    assert.equal(topologica.fullName, 'Fred Flintstone');
   });
 
   it('Should accept a comma delimited string as inputs.', () => {
     const fullName = ({firstName, lastName}) => `${firstName} ${lastName}`;
     fullName.inputs = 'firstName, lastName';
-    const dataflow = topologica({ fullName });
-    dataflow({
+    const topologica = Topologica({ fullName });
+    topologica({
       firstName: 'Fred',
       lastName: 'Flintstone'
     });
-    assert.equal(dataflow.fullName, 'Fred Flintstone');
+    assert.equal(topologica.fullName, 'Fred Flintstone');
   });
 
   it('Should accept reactive function as an array.', () => {
@@ -101,12 +101,12 @@ describe('topologica.js', () => {
       ({firstName, lastName}) => `${firstName} ${lastName}`,
       ['firstName', 'lastName']
     ]
-    const dataflow = topologica({ fullName });
-    dataflow({
+    const topologica = Topologica({ fullName });
+    topologica({
       firstName: 'Fred',
       lastName: 'Flintstone'
     });
-    assert.equal(dataflow.fullName, 'Fred Flintstone');
+    assert.equal(topologica.fullName, 'Fred Flintstone');
   });
 
   it('Should accept reactive function as an array, with inputs as a string.', () => {
@@ -114,55 +114,55 @@ describe('topologica.js', () => {
       ({firstName, lastName}) => `${firstName} ${lastName}`,
       'firstName,lastName'
     ]
-    const dataflow = topologica({ fullName });
-    dataflow({
+    const topologica = Topologica({ fullName });
+    topologica({
       firstName: 'Fred',
       lastName: 'Flintstone'
     });
-    assert.equal(dataflow.fullName, 'Fred Flintstone');
+    assert.equal(topologica.fullName, 'Fred Flintstone');
   });
 
   it('Should only execute when all inputs are defined.', () => {
-    const dataflow = topologica({
+    const topologica = Topologica({
       fullName: [
         ({firstName, lastName}) => `${firstName} ${lastName}`,
         'firstName, lastName'
       ]
     });
 
-    dataflow({
+    topologica({
       lastName: 'Flintstone'
     });
-    assert.equal(dataflow.fullName, undefined);
+    assert.equal(topologica.fullName, undefined);
 
-    dataflow({
+    topologica({
       firstName: 'Wilma'
     });
-    assert.equal(dataflow.fullName, 'Wilma Flintstone');
+    assert.equal(topologica.fullName, 'Wilma Flintstone');
   });
 
   it('Should handle case of 3 inputs.', () => {
-    const dataflow = topologica({
+    const topologica = Topologica({
       d: [({a, b, c}) => a + b + c, 'a,b,c']
     });
-    dataflow({
+    topologica({
       a: 5,
       b: 8,
       c: 2
     });
-    assert.equal(dataflow.d, 15);
+    assert.equal(topologica.d, 15);
   });
 
   it('Should handle spaces in input string.', () => {
-    const dataflow = topologica({
+    const topologica = Topologica({
       d: [({a, b, c}) => a + b + c, '  a ,    b, c   ']
     });
-    dataflow({
+    topologica({
       a: 5,
       b: 8,
       c: 2
     });
-    assert.equal(dataflow.d, 15);
+    assert.equal(topologica.d, 15);
   });
 
   // Data flow graph, read from top to bottom.
@@ -174,16 +174,16 @@ describe('topologica.js', () => {
   //    e   
   //
   it('Should evaluate not-too-tricky case.', () => {
-    const dataflow = topologica({
+    const topologica = Topologica({
       b: [({a}) => a + 1, 'a'],
       d: [({c}) => c + 1, 'c'],
       e: [({b, d}) => b + d, 'b, d']
     });
-    dataflow({
+    topologica({
       a: 1,
       c: 2
     });
-    assert.equal(dataflow.e, (1 + 1) + (2 + 1));
+    assert.equal(topologica.e, (1 + 1) + (2 + 1));
   });
 
   //      a
@@ -194,21 +194,21 @@ describe('topologica.js', () => {
   //     \ /
   //      e   
   it('Should evaluate tricky case.', () => {
-    const dataflow = topologica({
+    const topologica = Topologica({
       b: [({a}) => a + 1, 'a'],
       c: [({b}) => b + 1, 'b'],
       d: [({a}) => a + 1, 'a'],
       e: [({b, d}) => b + d, 'b, d']
     });
-    dataflow({
+    topologica({
       a: 5
     });
-    const a = dataflow.a;
+    const a = topologica.a;
     const b = a + 1;
     const c = b + 1;
     const d = a + 1;
     const e = b + d;
-    assert.equal(dataflow.e, e);
+    assert.equal(topologica.e, e);
   });
 
 
@@ -222,7 +222,7 @@ describe('topologica.js', () => {
   //     \ / /
   //       h   
   it('Should evaluate trickier case.', () => {
-    const dataflow = topologica({
+    const topologica = Topologica({
       b: [({a}) => a + 1, 'a'],
       c: [({b}) => b + 1, 'b'],
       d: [({c}) => c + 1, 'c'],
@@ -231,10 +231,10 @@ describe('topologica.js', () => {
       g: [({a}) => a + 1, 'a'],
       h: [({d, f, g}) => d + f + g, 'd, f, g']
     });
-    dataflow({
+    topologica({
       a: 5
     });
-    const a = dataflow.a;
+    const a = topologica.a;
     const b = a + 1;
     const c = b + 1;
     const d = c + 1;
@@ -242,23 +242,23 @@ describe('topologica.js', () => {
     const f = e + 1;
     const g = a + 1;
     const h = d + f + g;
-    assert.equal(dataflow.h, h);
+    assert.equal(topologica.h, h);
   });
 
   it('Should work with booleans.', () => {
-    const dataflow = topologica({
+    const topologica = Topologica({
       b: [({a}) => !a, 'a']
     });
-    dataflow({
+    topologica({
       a: false
     });
-    assert.equal(dataflow.b, true);
+    assert.equal(topologica.b, true);
   });
 
   it('Should work with async functions.', done => {
-    const dataflow = topologica({
+    const topologica = Topologica({
       bPromise: [
-        ({a}) => Promise.resolve(a + 5).then(b => dataflow({ b })),
+        ({a}) => Promise.resolve(a + 5).then(b => topologica({ b })),
         'a'
       ],
       c: [
@@ -269,16 +269,16 @@ describe('topologica.js', () => {
         'b'
       ]
     });
-    dataflow({
+    topologica({
       a: 5
     });
   });
 
   it('Should work with async functions.', done => {
-    topologica({
+    Topologica({
       bPromise: [
-        dataflow => Promise.resolve(dataflow.a + 5)
-          .then(b => dataflow({ b })),
+        topologica => Promise.resolve(topologica.a + 5)
+          .then(b => topologica({ b })),
         'a'
       ],
       c: [
@@ -294,43 +294,43 @@ describe('topologica.js', () => {
   it('Should only propagate changes when values change.', () => {
     let invocations = 0;
 
-    const dataflow = topologica({
+    const topologica = Topologica({
       b: [({a}) => invocations++, 'a']
     });
 
     assert.equal(invocations, 0);
 
-    dataflow({ a: 2 });
+    topologica({ a: 2 });
     assert.equal(invocations, 1);
 
-    dataflow({ a: 2 });
+    topologica({ a: 2 });
     assert.equal(invocations, 1);
 
-    dataflow({ a: 99 });
+    topologica({ a: 99 });
     assert.equal(invocations, 2);
   });
 
   it('Should propagate changes if a single dependency changes.', () => {
     let invocations = 0;
 
-    const dataflow = topologica({
+    const topologica = Topologica({
       c: [() => invocations++, 'a, b']
     });
 
     assert.equal(invocations, 0);
 
-    dataflow({ a: 2, b: 4 });
+    topologica({ a: 2, b: 4 });
     assert.equal(invocations, 1);
 
-    dataflow({ a: 2 });
+    topologica({ a: 2 });
     assert.equal(invocations, 1);
 
-    dataflow({ a: 2, b: 6 });
+    topologica({ a: 2, b: 6 });
     assert.equal(invocations, 2);
   });
 
   it('Should be fast.', () => {
-    const dataflow = topologica({
+    const topologica = Topologica({
       b: [({a}) => a + 1, 'a'],
       c: [({b}) => b + 1, 'b'],
       d: [({c}) => c + 1, 'c'],
@@ -344,7 +344,7 @@ describe('topologica.js', () => {
     for(let j = 0; j < numRuns; j++){
       const begin = Date.now();
       for(let i = 0; i < 200000; i++){
-        dataflow({ a: i });
+        topologica({ a: i });
       }
       const end = Date.now();
       const time = end - begin;

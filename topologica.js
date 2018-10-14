@@ -1,16 +1,16 @@
 const keys = Object.keys;
 
 export default reactiveFunctions => {
-  const dataflow = function(stateChange) {
+  const topologica = function(stateChange) {
     depthFirstSearch(keys(stateChange).map(property => {
-      if (dataflow[property] !== stateChange[property]) {
-        dataflow[property] = stateChange[property];
+      if (topologica[property] !== stateChange[property]) {
+        topologica[property] = stateChange[property];
         return property;
       }
     }))
       .reverse()
       .forEach(invoke);
-    return dataflow;
+    return topologica;
   };
 
   const functions = {};
@@ -21,7 +21,7 @@ export default reactiveFunctions => {
   };
 
   const allDefined = inputs => inputs
-    .every(property => dataflow[property] !== undefined);
+    .every(property => topologica[property] !== undefined);
 
   keys(reactiveFunctions).forEach(property => {
     const reactiveFunction = reactiveFunctions[property];
@@ -39,7 +39,7 @@ export default reactiveFunctions => {
 
     functions[property] = () => {
       if (allDefined(inputs)) {
-        dataflow[property] = fn(dataflow);
+        topologica[property] = fn(topologica);
       }
     };
   });
@@ -65,5 +65,5 @@ export default reactiveFunctions => {
     return nodeList;
   }
 
-  return dataflow;
+  return topologica;
 };
