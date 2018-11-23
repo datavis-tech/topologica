@@ -304,5 +304,6 @@ Similar initiatives:
  * [Crosslink.js](https://github.com/monfera/crosslink)
  * [Flyd](https://github.com/paldepind/flyd)
  * [Javelin](https://github.com/hoplon/javelin)
+ * [S](https://github.com/adamhaile/S)
 
 See also this excellent article [State management in JavaScript by David Meister](https://codeburst.io/state-management-in-javascript-15d0d98837e1).
