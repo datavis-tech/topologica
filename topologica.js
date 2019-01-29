@@ -1,7 +1,18 @@
 const keys = Object.keys;
 
 export default reactiveFunctions => {
-  const state = {};
+  const topologica = function(stateChange) {
+    depthFirstSearch(keys(stateChange).map(property => {
+      if (topologica[property] !== stateChange[property]) {
+        topologica[property] = stateChange[property];
+        return property;
+      }
+    }))
+      .reverse()
+      .forEach(invoke);
+    return topologica;
+  };
+
   const functions = {};
   const edges = {};
 
@@ -9,34 +20,26 @@ export default reactiveFunctions => {
     functions[property]();
   };
 
-  const allDefined = dependencies => {
-    const arg = {};
-    return dependencies.every(property => {
-      if (state[property] !== undefined){
-        arg[property] = state[property];
-        return true;
-      }
-    }) ? arg : null;
-  };
+  const allDefined = inputs => inputs
+    .every(property => topologica[property] !== undefined);
 
   keys(reactiveFunctions).forEach(property => {
     const reactiveFunction = reactiveFunctions[property];
-    let dependencies = reactiveFunction.dependencies;
-    const fn = dependencies ? reactiveFunction : reactiveFunction[0];
-    dependencies = dependencies || reactiveFunction[1];
+    let inputs = reactiveFunction.inputs;
+    const fn = inputs ? reactiveFunction : reactiveFunction[0];
+    inputs = inputs || reactiveFunction[1];
 
-    dependencies = dependencies.split
-      ? dependencies.split(',').map(str => str.trim())
-      : dependencies;
+    inputs = inputs.split
+      ? inputs.split(',').map(str => str.trim())
+      : inputs;
 
-    dependencies.forEach(input => {
+    inputs.forEach(input => {
       (edges[input] = edges[input] || []).push(property);
     });
 
     functions[property] = () => {
-      const arg = allDefined(dependencies);
-      if (arg) {
-        state[property] = fn(arg);
+      if (allDefined(inputs)) {
+        topologica[property] = fn(topologica);
       }
     };
   });
@@ -62,20 +65,5 @@ export default reactiveFunctions => {
     return nodeList;
   }
 
-  const set = function(stateChange) {
-    depthFirstSearch(keys(stateChange).map(property => {
-      if (state[property] !== stateChange[property]) {
-        state[property] = stateChange[property];
-        return property;
-      }
-    }))
-      .reverse()
-      .forEach(invoke);
-    return this;
-  };
-
-  return {
-    set,
-    get: () => state
-  };
+  return topologica;
 };
